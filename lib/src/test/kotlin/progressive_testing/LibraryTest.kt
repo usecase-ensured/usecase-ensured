@@ -3,7 +3,7 @@
  */
 package progressive_testing
 
-import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(ProgressiveTestingExtension::class)
@@ -11,7 +11,7 @@ class LibraryTest {
     @TestFile("tst-file")
     fun someLibraryMethodReturnsTrue() {
         val classUnderTest = Library()
-        assertFalse(classUnderTest.someLibraryMethod(), "someLibraryMethod " +
+        assertTrue(classUnderTest.someLibraryMethod(), "someLibraryMethod " +
                 "should return 'true'")
     }
 }
