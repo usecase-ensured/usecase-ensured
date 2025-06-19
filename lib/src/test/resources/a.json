@@ -1,0 +1,99 @@
+{
+	"info": {
+		"_postman_id": "30e94718-4186-4956-b4ea-3caae50f080d",
+		"name": "a",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46030483",
+		"_collection_link": "https://bitknot-6797149.postman.co/workspace/bitknot's-Workspace~004a6a44-0266-41d7-8482-6e9679410bc8/collection/46030483-30e94718-4186-4956-b4ea-3caae50f080d?action=share&source=collection_link&creator=46030483"
+	},
+	"item": [
+		{
+			"name": "secret",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = {",
+							"    \"response\": 201,",
+							"    \"content\" : {",
+							"        \"id\": any(),",
+							"        \"name\": \"Bob\"",
+							"    }",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080",
+					"host": [
+						"localhost"
+					],
+					"port": "8080"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "secret",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list secrets",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/secret/all",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"secret",
+						"all"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
