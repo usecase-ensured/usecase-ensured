@@ -1,8 +1,8 @@
 package progressive_testing
 
-import org.junit.jupiter.api.Test
+import java.lang.annotation.Inherited
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-@Test
+@Inherited
 annotation class TestFile(val value: String)

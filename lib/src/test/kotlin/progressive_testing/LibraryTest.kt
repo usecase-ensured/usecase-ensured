@@ -3,15 +3,25 @@
  */
 package progressive_testing
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.platform.commons.annotation.Testable
 
 @ExtendWith(ProgressiveTestingExtension::class)
 class LibraryTest {
-    @TestFile("tst-file")
+
+    @Test
+    @TestFile("a.json")
     fun someLibraryMethodReturnsTrue() {
         val classUnderTest = Library()
         assertTrue(classUnderTest.someLibraryMethod(), "someLibraryMethod " +
                 "should return 'true'")
+    }
+
+    @Test
+    fun `normal test`() {
+        assertEquals(1, 1)
     }
 }

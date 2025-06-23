@@ -8,7 +8,7 @@
 	},
 	"item": [
 		{
-			"name": "secret",
+			"name": "create person",
 			"event": [
 				{
 					"listen": "test",
@@ -17,7 +17,7 @@
 							"const response = {",
 							"    \"response\": 201,",
 							"    \"content\" : {",
-							"        \"id\": any(),",
+							"        \"id\": \"{{any}}\",",
 							"        \"name\": \"Bob\"",
 							"    }",
 							"}"
@@ -31,17 +31,20 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080",
+					"raw": "localhost:8080/person",
 					"host": [
 						"localhost"
 					],
-					"port": "8080"
+					"port": "8080",
+					"path": [
+						"person"
+					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "secret",
+			"name": "get person",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -49,12 +52,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/1",
+					"raw": "localhost:8080/person/1",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
+						"person",
 						"1"
 					]
 				}
@@ -62,7 +66,7 @@
 			"response": []
 		},
 		{
-			"name": "list secrets",
+			"name": "list person",
 			"event": [
 				{
 					"listen": "test",
@@ -82,13 +86,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/secret/all",
+					"raw": "localhost:8080/person/all",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"secret",
+						"person",
 						"all"
 					]
 				}

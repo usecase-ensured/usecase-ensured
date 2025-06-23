@@ -21,6 +21,8 @@ dependencies {
     // this is not just a test dependency since we are building on top of
     // JUnit here.
     implementation("org.junit.jupiter:junit-jupiter:5.13.1")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.0")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
