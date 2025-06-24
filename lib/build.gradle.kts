@@ -11,6 +11,9 @@ plugins {
     `java-library`
 }
 
+group = "progressive-testing"
+version = "0.0.1"
+
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
