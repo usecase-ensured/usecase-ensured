@@ -1,19 +1,19 @@
 package dummy_api
 
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.boot.test.web.client.exchange
 import org.springframework.boot.test.web.client.getForEntity
-import org.springframework.core.ParameterizedTypeReference
-import org.springframework.http.HttpMethod
+import progressive_testing.ProgressiveTestingExtension
 import progressive_testing.TestFile
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ExtendWith(ProgressiveTestingExtension::class)
 class IntegrationTest(
     @Autowired private val template: TestRestTemplate,
     @Autowired private val controller: DummyController,
@@ -62,5 +62,11 @@ class IntegrationTest(
         assertEquals(200, resp.statusCode.value())
         assertArrayEquals(arrayOf(DummyDto(0, "a"), DummyDto(1, "b")), resp
             .body!!)
+    }
+
+    @Test
+    @TestFile("a-test.json")
+    fun `can create dummy ALT`() {
+
     }
 }

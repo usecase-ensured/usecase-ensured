@@ -8,7 +8,7 @@
 	},
 	"item": [
 		{
-			"name": "create person",
+			"name": "create dummy",
 			"event": [
 				{
 					"listen": "test",
@@ -29,22 +29,42 @@
 			],
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "a",
+						"value": "a",
+						"type": "text"
+					},
+					{
+						"key": "b",
+						"value": "b",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"a\": 1,\n    \"b\": [2]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "localhost:8080/person",
+					"raw": "localhost:8080/dummy",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"person"
+						"dummy"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "get person",
+			"name": "get dummy",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -52,21 +72,21 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/person/1",
+					"raw": "localhost:8080/dummy/0",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"person",
-						"1"
+						"dummy",
+						"0"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "list person",
+			"name": "list dummies",
 			"event": [
 				{
 					"listen": "test",
@@ -86,13 +106,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/person/all",
+					"raw": "localhost:8080/dummy/all",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"person",
+						"dummy",
 						"all"
 					]
 				}

@@ -2,9 +2,16 @@ package progressive_testing
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.restassured.RestAssured.given
+import io.restassured.http.ContentType
+import io.restassured.http.Header
+import io.restassured.http.Headers
+import org.hamcrest.CoreMatchers.equalTo
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.api.extension.ParameterContext
+import org.junit.jupiter.api.extension.ParameterResolver
 import progressive_testing.data.ExpectedResponse
 import progressive_testing.data.Request
 import progressive_testing.data.TestStep
@@ -34,13 +41,33 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
             val steps = buildSteps(filePath)
 
             for (step in steps) {
-                val response = doRequest(step)
-
-                if (step.expectedResponse != null) {
-                    assertEquals(step.expectedResponse, response)
-                }
-
+                doRequest(step)
             }
+        }
+    }
+
+    private fun doRequest(step: TestStep) {
+        val builder = given()
+
+        builder.baseUri(step.request.url)
+
+        step.request.body?.let { builder.body(it) }
+        val typedHeaders =
+            step.request.headers.map { Header(it.key, it.value) }
+
+        builder.headers(Headers(typedHeaders))
+        builder.contentType(ContentType.JSON)
+        builder.accept(ContentType.JSON)
+
+        val response = builder.request(step.request.method.name)
+        step.expectedResponse?.let {
+            response.then()
+                .statusCode(
+                    it.expectedResponse.requiredAt("/response").asInt()
+                )
+
+            val typedBody = response.body.`as`(JsonNode::class.java)
+            assertEquals(it.expectedResponse.requiredAt("/content"), typedBody)
         }
     }
 
@@ -82,18 +109,29 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
         for (entry in entries) {
             val name = entry.requiredAt("/name").asText()
             val method = entry.requiredAt("/request/method").asText() // used
-            val header = entry.requiredAt("/request/header").asText() // used
-            // this method for
-            val url = entry.requiredAt("/request/url/raw").asText()
+            val headersNode = entry.requiredAt("/request/header")
 
-            val request = Request(method, header, url)
+            val headers = headersNode.associate {
+                it.requiredAt("/key").asText() to it.requiredAt("/value")
+                    .asText()
+            }
+
+            val url = entry.requiredAt("/request/url/raw").asText()
+            val body =
+                entry.at("/request/body/raw")
+                    .takeUnless { it.isMissingNode }
+                    ?.asText()
+
+            val request =
+                Request(Request.Method.valueOf(method), headers, url, body)
             val expectation = entry.requiredAt("/event/0/script/exec")
-                .valueStream().map { it -> it.asText() }
-                .reduce { acc, s -> acc + s }.get().toString()
+                .valueStream().map { it.asText() }
+                .reduce { acc, s -> acc + s }.get()
                 .replace(Regex(" +"), " ")
 
             val jsonValue = expectation.split("=").get(1).trim()
-            val parsedExpectedJson = ExpectedResponse(MAPPER.reader().readTree(jsonValue))
+            val parsedExpectedJson =
+                ExpectedResponse(MAPPER.reader().readTree(jsonValue))
 
             val step = TestStep(name, request, parsedExpectedJson)
 
