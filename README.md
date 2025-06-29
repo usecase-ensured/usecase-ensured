@@ -19,8 +19,8 @@ RESTful APIs and Postman. Let's also list some concrete pain points.
 
 # TABLE OF CONTENTS
 
-- [PAINPOINTS ILLUSTRATED](#h2-paintpoints-illustrated)
-- [HOW TO USE THE TOOL](#h2-how-to-use-the-tool)
+- [PAINPOINTS ILLUSTRATED](#paintpoints-illustrated)
+- [HOW TO USE THE TOOL](#how-to-use-the-tool)
 
 ## PAINPOINTS ILLUSTRATED
 
