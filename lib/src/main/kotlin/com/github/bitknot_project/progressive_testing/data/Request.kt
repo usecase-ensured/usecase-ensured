@@ -1,4 +1,4 @@
-package progressive_testing.data
+package com.github.bitknot_project.progressive_testing.data
 
 data class Request(
     var method: Method,

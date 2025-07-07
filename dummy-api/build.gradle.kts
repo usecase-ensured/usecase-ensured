@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm") version "2.1.20"
-    id("org.springframework.boot") version "3.5.3"
-    kotlin("plugin.spring") version "2.1.20"
+    kotlin("jvm")
+    id("org.springframework.boot")
+    kotlin("plugin.spring")
     application
 
 }
@@ -9,8 +9,24 @@ plugins {
 group = "progressive-testing"
 version = "0.0.1"
 
+fun property(name: String): Any? {
+    return project.findProperty(name)
+}
+
 repositories {
     mavenCentral()
+    maven {
+        url =
+            uri(property("githubPackageRepo") as String)
+        credentials {
+            username = property("githubRepoUser") as String
+            password = property("githubRepoPassword") as String
+        }
+    }
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor(0, TimeUnit.SECONDS)
 }
 
 dependencies {

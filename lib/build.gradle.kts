@@ -7,12 +7,69 @@
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm")
     `java-library`
+    `maven-publish`
+    signing
 }
 
-group = "progressive-testing"
-version = "0.0.1"
+fun property(name: String): Any? {
+    return project.findProperty(name)
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "github"
+            url =
+                uri(property("githubPackageRepo") as String)
+            credentials {
+                username = property("githubRepoUser") as String
+                password = property("githubRepoPassword") as String
+            }
+            mavenContent {
+                snapshotsOnly()
+            }
+        }
+    }
+    publications {
+
+        create<MavenPublication>("mavenKotlin") {
+            from(components["java"])
+
+            pom {
+                version = "0.0.1-SNAPSHOT"
+                name = "Progressive Testing"
+                artifactId = "progressive_testing"
+                groupId = "com.github.bitknot_project.progressive_testing"
+                description =
+                    "A library for running JUnit tests based on Postman " +
+                            "collections. Improve the synergy between exploratory testing and " +
+                            "traditional testing!"
+                url = "https://github.com/bitknot-project/progressive-testing"
+                licenses {
+                    license {
+                        name = "MIT License"
+                        url = "https://mit-license.org/"
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = "nazaratius"
+                    }
+                }
+
+                scm {
+                    connection =
+                        "scm:git:git@github.com:bitknot-project/progressive-testing.git"
+                    url =
+                        "https://github.com/bitknot-project/progressive-testing#"
+                }
+            }
+        }
+    }
+}
 
 repositories {
     // Use Maven Central for resolving dependencies.

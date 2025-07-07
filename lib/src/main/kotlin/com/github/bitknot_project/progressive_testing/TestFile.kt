@@ -1,4 +1,4 @@
-package progressive_testing
+package com.github.bitknot_project.progressive_testing
 
 import java.lang.annotation.Inherited
 

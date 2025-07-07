@@ -1,7 +1,10 @@
-package progressive_testing
+package com.github.bitknot_project.progressive_testing
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.bitknot_project.progressive_testing.data.ExpectedResponse
+import com.github.bitknot_project.progressive_testing.data.Request
+import com.github.bitknot_project.progressive_testing.data.TestStep
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.http.Header
@@ -9,9 +12,6 @@ import io.restassured.http.Headers
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ExtensionContext
-import progressive_testing.data.ExpectedResponse
-import progressive_testing.data.Request
-import progressive_testing.data.TestStep
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.file.Files
