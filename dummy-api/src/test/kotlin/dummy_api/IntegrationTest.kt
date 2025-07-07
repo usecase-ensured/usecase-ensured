@@ -1,5 +1,7 @@
 package dummy_api
 
+import com.github.bitknot_project.progressive_testing.ProgressiveTestingExtension
+import com.github.bitknot_project.progressive_testing.TestFile
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -9,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.getForEntity
-import progressive_testing.ProgressiveTestingExtension
-import progressive_testing.TestFile
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ExtendWith(ProgressiveTestingExtension::class)
