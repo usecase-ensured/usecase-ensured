@@ -25,15 +25,13 @@ repositories {
     }
 }
 
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor(0, TimeUnit.SECONDS)
-}
-
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web:3.5.3")
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:3.5.3"))
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-security")
 
     testImplementation(project(":lib"))
-    testImplementation("org.springframework.boot:spring-boot-starter-test:3.5.3")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.junit.jupiter:junit-jupiter:5.13.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
