@@ -32,6 +32,11 @@ class DummyController {
         return store.get(id) ?: throw RuntimeException("dummy $id not found")
     }
 
+    @GetMapping("secret")
+    fun getSecret() : String {
+        return "this is a secret"
+    }
+
     @GetMapping("all")
     fun list() : List<DummyDto> {
         return store.values.toList()

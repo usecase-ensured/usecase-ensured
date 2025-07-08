@@ -58,13 +58,16 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
 
         val response = builder.request(step.request.method.name)
         step.expectedResponse?.let {
-            response.then()
-                .statusCode(
-                    it.expectedResponse.requiredAt("/response").asInt()
-                )
+            val expectedStatusCode = it.expectedResponse.at("/response")
+            if (!expectedStatusCode.isMissingNode) {
+                response.then().statusCode(expectedStatusCode.asInt())
+            }
 
-            val typedBody = response.body.`as`(JsonNode::class.java)
-            assertEquals(it.expectedResponse.requiredAt("/content"), typedBody)
+            val expectedBody = it.expectedResponse.at("/content")
+            if (!expectedBody.isMissingNode) {
+                val typedBody = response.body.`as`(JsonNode::class.java)
+                assertEquals(expectedBody, typedBody)
+            }
         }
     }
 
