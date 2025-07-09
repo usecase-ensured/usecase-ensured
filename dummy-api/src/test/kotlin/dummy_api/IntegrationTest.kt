@@ -82,9 +82,7 @@ class IntegrationTest(
 
     @Test
     @TestFile("a-test.json")
-    fun `can create dummy ALT`() {
-
-    }
+    fun `can create dummy ALT`() {}
 
     @Test
     @TestFile("secret.json")
@@ -93,4 +91,8 @@ class IntegrationTest(
     @Test
     @TestFile("multi-step.json")
     fun `can retrieve dummy (2)`() {}
+
+    @Test
+    @TestFile("meta-variable.json")
+    fun `can use meta variables`() {}
 }

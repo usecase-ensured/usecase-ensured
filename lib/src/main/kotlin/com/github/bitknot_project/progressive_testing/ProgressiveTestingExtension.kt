@@ -9,7 +9,7 @@ import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.http.Header
 import io.restassured.http.Headers
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import java.io.FileInputStream
@@ -61,12 +61,47 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
                 response.then().statusCode(expectedStatusCode.asInt())
             }
 
-            val expectedBody = it.expectedResponse.at("/content")
-            if (!expectedBody.isMissingNode) {
-                val typedBody = response.body.`as`(JsonNode::class.java)
-                assertEquals(expectedBody, typedBody)
+            val expected = it.expectedResponse.at("/content")!!
+            if (!expected.isMissingNode) {
+                val actual =
+                    response.body.`as`(JsonNode::class.java) as JsonNode
+
+                val fieldAssertions = createFieldAssertions(expected, actual)
+                fieldAssertions.forEach { assertion -> assertion.invoke() }
             }
         }
+    }
+
+    private fun createFieldAssertions(
+        expectedNode: JsonNode,
+        actualNode: JsonNode
+    ): List<() -> Unit> {
+        val acc = mutableListOf<() -> Unit>()
+        val actualValueMap = mutableMapOf<String, JsonNode>()
+        actualNode.forEachEntry { k, v -> actualValueMap[k] = v }
+
+        val expectedValueMap = mutableMapOf<String, JsonNode>()
+        expectedNode.forEachEntry { k, v -> expectedValueMap[k] = v }
+
+        val unexpectedFields = expectedValueMap.keys.minus(actualValueMap.keys).toMutableList()
+        unexpectedFields += actualValueMap.keys.minus(expectedValueMap.keys)
+
+        if (unexpectedFields.isNotEmpty()) {
+            return listOf({ fail("unexpected fields $unexpectedFields present") })
+        }
+        actualNode.forEachEntry { name, actual ->
+            val expected = expectedNode.at("/$name")
+            val metaAssertion = metaVariableAssertion(expected, actual)
+            acc += metaAssertion ?: { assertEquals(expected, actual) }
+        }
+        return acc.toList()
+    }
+
+    private fun metaVariableAssertion(expected: JsonNode, actual: JsonNode): (() -> Unit)? {
+        if (expected.isTextual && expected.asText() == "{{any}}") {
+            return { assertTrue(true) }
+        }
+        return null
     }
 
     private fun ensureThatPathPointsToFile(path: Path) {
