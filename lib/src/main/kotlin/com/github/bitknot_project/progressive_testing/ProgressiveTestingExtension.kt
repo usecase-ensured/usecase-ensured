@@ -49,10 +49,8 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
         builder.baseUri(step.request.url)
 
         step.request.body?.let { builder.body(it) }
-        val typedHeaders =
-            step.request.headers.map { Header(it.key, it.value) }
 
-        builder.headers(Headers(typedHeaders))
+        builder.headers(Headers(step.request.headers))
         builder.contentType(ContentType.JSON)
         builder.accept(ContentType.JSON)
 
@@ -114,7 +112,7 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
             val headers = headersNode.associate {
                 it.requiredAt("/key").asText() to it.requiredAt("/value")
                     .asText()
-            }
+            }.map { (k, v) -> Header(k, v) }
 
             val url = entry.requiredAt("/request/url/raw").asText()
             val body =
