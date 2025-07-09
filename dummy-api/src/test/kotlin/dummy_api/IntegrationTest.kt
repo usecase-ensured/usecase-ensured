@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.getForEntity
+import org.springframework.http.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ExtendWith(ProgressiveTestingExtension::class)
@@ -60,8 +61,23 @@ class IntegrationTest(
         val resp = template.getForEntity<Array<DummyDto>>("$url/all")
 
         assertEquals(200, resp.statusCode.value())
-        assertArrayEquals(arrayOf(DummyDto(0, "a"), DummyDto(1, "b")), resp
-            .body!!)
+        assertArrayEquals(
+            arrayOf(DummyDto(0, "a"), DummyDto(1, "b")), resp
+                .body!!
+        )
+    }
+
+    @Test
+    fun `can call secret endpoint`() {
+        val headers = HttpHeaders()
+        headers.add("Authorization", "Basic Ym9iOmJvYg==")
+        val response = template.exchange(
+            "$url/secret", HttpMethod.GET,
+            HttpEntity<Any>(headers),
+            String::class.java
+        )
+
+        assertEquals(response.statusCode, HttpStatus.OK)
     }
 
     @Test
@@ -69,4 +85,12 @@ class IntegrationTest(
     fun `can create dummy ALT`() {
 
     }
+
+    @Test
+    @TestFile("secret.json")
+    fun `can call secret endpoint (2)`(){}
+
+    @Test
+    @TestFile("multi-step.json")
+    fun `can retrieve dummy (2)`() {}
 }
