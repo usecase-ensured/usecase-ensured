@@ -89,4 +89,8 @@ class IntegrationTest(
     @Test
     @TestFile("secret.json")
     fun `can call secret endpoint (2)`(){}
+
+    @Test
+    @TestFile("multi-step.json")
+    fun `can retrieve dummy (2)`() {}
 }
