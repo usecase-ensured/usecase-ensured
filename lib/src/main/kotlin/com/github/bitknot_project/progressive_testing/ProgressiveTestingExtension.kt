@@ -96,9 +96,9 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
         }
         actualNode.forEachEntry { fieldName, actual ->
             val expected = expectedNode.at("/$fieldName")
-            val metaAssertion = metaVariableAssertion(expected, actual, step)
+            val metaAssertion = metaVariableAssertion(expected, actualNode, fieldName, step)
             if (metaAssertion == null) {
-                assertEquals(expected, actual, step.asTraceHint(fieldName))
+                assertEquals(expected, actual, step.asTraceHint(fieldName, actualNode))
             } else {
                 acc += metaAssertion
             }
@@ -108,11 +108,12 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
 
     private fun metaVariableAssertion(
         expected: JsonNode,
-        actual: JsonNode,
+        actualJson: JsonNode,
+        actualFieldName: String,
         step: TestStep
     ): (() -> Unit)? {
         if (expected.isTextual && expected.asText() == "{{any}}") {
-            return { assertTrue(true, step.asTraceHint()) }
+            return { assertTrue(true, step.asTraceHint(actualFieldName, actualJson)) }
         }
         return null
     }
