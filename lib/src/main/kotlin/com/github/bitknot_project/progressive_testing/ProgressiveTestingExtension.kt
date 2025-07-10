@@ -58,6 +58,8 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
         step.expectedResponse?.let {
             val expectedStatusCode = it.expectedResponse.at("/response")
             if (!expectedStatusCode.isMissingNode) {
+                val msg = "invalid HTTP status: " + step.asTraceHint()
+                assertEquals(expectedStatusCode.asInt(), response.statusCode, msg)
                 response.then().statusCode(expectedStatusCode.asInt())
             }
 
@@ -66,7 +68,7 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
                 val actual =
                     response.body.`as`(JsonNode::class.java) as JsonNode
 
-                val fieldAssertions = createFieldAssertions(expected, actual)
+                val fieldAssertions = createFieldAssertions(expected, actual, step)
                 fieldAssertions.forEach { assertion -> assertion.invoke() }
             }
         }
@@ -74,7 +76,8 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
 
     private fun createFieldAssertions(
         expectedNode: JsonNode,
-        actualNode: JsonNode
+        actualNode: JsonNode,
+        step: TestStep
     ): List<() -> Unit> {
         val acc = mutableListOf<() -> Unit>()
         val actualValueMap = mutableMapOf<String, JsonNode>()
@@ -87,19 +90,29 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
         unexpectedFields += actualValueMap.keys.minus(expectedValueMap.keys)
 
         if (unexpectedFields.isNotEmpty()) {
-            return listOf({ fail("unexpected fields $unexpectedFields present") })
+            return listOf {
+                fail("${step.asTraceHint()}: unexpected fields $unexpectedFields present")
+            }
         }
-        actualNode.forEachEntry { name, actual ->
-            val expected = expectedNode.at("/$name")
-            val metaAssertion = metaVariableAssertion(expected, actual)
-            acc += metaAssertion ?: { assertEquals(expected, actual) }
+        actualNode.forEachEntry { fieldName, actual ->
+            val expected = expectedNode.at("/$fieldName")
+            val metaAssertion = metaVariableAssertion(expected, actual, step)
+            if (metaAssertion == null) {
+                assertEquals(expected, actual, step.asTraceHint(fieldName))
+            } else {
+                acc += metaAssertion
+            }
         }
         return acc.toList()
     }
 
-    private fun metaVariableAssertion(expected: JsonNode, actual: JsonNode): (() -> Unit)? {
+    private fun metaVariableAssertion(
+        expected: JsonNode,
+        actual: JsonNode,
+        step: TestStep
+    ): (() -> Unit)? {
         if (expected.isTextual && expected.asText() == "{{any}}") {
-            return { assertTrue(true) }
+            return { assertTrue(true, step.asTraceHint()) }
         }
         return null
     }
@@ -166,7 +179,7 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
             val parsedExpectedJson =
                 ExpectedResponse(MAPPER.reader().readTree(jsonValue))
 
-            val step = TestStep(name, request, parsedExpectedJson)
+            val step = TestStep(path, name, request, parsedExpectedJson)
 
             steps += step
         }
