@@ -18,22 +18,28 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
+/**
+ * Enables the functionality of running test cases based on external files,
+ * for example Postman collections. Configured per test method with the
+ * [com.github.bitknot_project.progressive_testing.TestFile] annotation.
+ *
+ * Apply on the test class with the [org.junit.jupiter.api.extension.ExtendWith]
+ * annotation.
+ */
 class ProgressiveTestingExtension : BeforeTestExecutionCallback {
     private companion object {
-        val PREFIX = Paths.get("src/test/resources/postman/")
         val MAPPER = ObjectMapper()
     }
 
-    override fun beforeTestExecution(context: ExtensionContext?) {
-        val maybeMethod = context!!.testMethod
+    override fun beforeTestExecution(context: ExtensionContext) {
+        val maybeMethod = context.testMethod
 
         if (maybeMethod.isPresent) {
             val method = maybeMethod.get()
 
-            val annotation = method.getAnnotation(TestFile::class.java)
-            val testFileAnnotation = annotation ?: return
+            val annotation = method.getAnnotation(TestFile::class.java) ?: return
 
-            val filePath = PREFIX.resolve(testFileAnnotation.value)
+            val filePath = annotation.type.pathPrefix.resolve(annotation.value)
 
             val steps = buildSteps(filePath)
 

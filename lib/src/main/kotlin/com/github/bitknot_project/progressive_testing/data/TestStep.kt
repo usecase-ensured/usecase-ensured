@@ -3,7 +3,7 @@ package com.github.bitknot_project.progressive_testing.data
 import com.fasterxml.jackson.databind.JsonNode
 import java.nio.file.Path
 
-data class TestStep(
+internal data class TestStep(
     val filePath: Path,
     val name: String,
     val request: Request,
