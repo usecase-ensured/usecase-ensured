@@ -7,6 +7,9 @@ import java.nio.file.Paths
 /**
  * This annotation is to be used on a test method.
  *
+ * **PREREQUISITE**: your app is expected to actually be running on a local port, this is an
+ * integration test!
+ *
  * Displaying the `run` button in the IDE near the test method signature requires the usual
  * [org.junit.jupiter.api.Test] annotation.
  *
