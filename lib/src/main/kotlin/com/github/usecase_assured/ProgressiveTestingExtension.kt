@@ -16,7 +16,6 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * Enables the functionality of running test cases based on external files,
@@ -37,7 +36,7 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
         if (maybeMethod.isPresent) {
             val method = maybeMethod.get()
 
-            val annotation = method.getAnnotation(TestFile::class.java) ?: return
+            val annotation = method.getAnnotation(Usecase::class.java) ?: return
 
             val filePath = annotation.type.pathPrefix.resolve(annotation.value)
 
