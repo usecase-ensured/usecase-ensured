@@ -32,9 +32,10 @@ publishing {
             }
         }
     }
+
     publications {
 
-        create<MavenPublication>("mavenKotlin") {
+        create<MavenPublication>("release") {
             from(components["java"])
 
             pom {
@@ -71,6 +72,10 @@ publishing {
     }
 }
 
+signing {
+    sign(publishing.publications["release"])
+}
+
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
@@ -93,6 +98,8 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(23)
     }
+    withJavadocJar()
+    withSourcesJar()
 }
 
 tasks.named<Test>("test") {

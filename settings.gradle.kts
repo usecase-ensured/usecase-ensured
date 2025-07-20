@@ -1,4 +1,4 @@
-rootProject.name = "progressive-testing"
+rootProject.name = "usecase-ensured"
 include("lib", "dummy-api")
 
 pluginManagement {
