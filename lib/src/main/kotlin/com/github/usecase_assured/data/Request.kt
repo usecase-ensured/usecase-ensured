@@ -1,4 +1,4 @@
-package com.github.bitknot_project.progressive_testing.data
+package com.github.usecase_assured.data
 
 import io.restassured.http.Header
 

@@ -1,7 +1,7 @@
 package dummy_api
 
-import com.github.bitknot_project.progressive_testing.ProgressiveTestingExtension
-import com.github.bitknot_project.progressive_testing.TestFile
+import com.github.usecase_assured.ProgressiveTestingExtension
+import com.github.usecase_assured.TestFile
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach

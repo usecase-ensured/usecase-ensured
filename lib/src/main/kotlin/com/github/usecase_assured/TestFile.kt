@@ -1,4 +1,4 @@
-package com.github.bitknot_project.progressive_testing
+package com.github.usecase_assured
 
 import java.lang.annotation.Inherited
 import java.nio.file.Path

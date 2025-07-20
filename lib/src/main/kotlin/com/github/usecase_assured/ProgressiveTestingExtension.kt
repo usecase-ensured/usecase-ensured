@@ -1,10 +1,10 @@
-package com.github.bitknot_project.progressive_testing
+package com.github.usecase_assured
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.bitknot_project.progressive_testing.data.ExpectedResponse
-import com.github.bitknot_project.progressive_testing.data.Request
-import com.github.bitknot_project.progressive_testing.data.TestStep
+import com.github.usecase_assured.data.ExpectedResponse
+import com.github.usecase_assured.data.Request
+import com.github.usecase_assured.data.TestStep
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.http.Header
