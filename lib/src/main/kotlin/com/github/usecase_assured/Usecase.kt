@@ -15,9 +15,9 @@ import java.nio.file.Paths
  *
  * ## Supported formats
  * #### Postman
- * The Postman collection files are expected in the `test/resources/postman`
- * folder. Simply exporting collections from Postman is enough, they should
- * be executed correctly.
+ * The Postman collections are expected in the `test/resources/postman` folder of your project.
+ * Simply exporting collections from Postman is enough, they should be executed correctly.
+ * **Postman environment variables are not supported** at the moment.
  *
  * Postman's **post-response script** is used to **add assertions** to any step of the collection.
  * The content is expected to have a certain structure, here is an example:

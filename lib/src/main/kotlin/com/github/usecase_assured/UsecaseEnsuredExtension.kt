@@ -25,7 +25,7 @@ import java.nio.file.Path
  * Apply on the test class with the [org.junit.jupiter.api.extension.ExtendWith]
  * annotation.
  */
-class ProgressiveTestingExtension : BeforeTestExecutionCallback {
+class UsecaseEnsuredExtension : BeforeTestExecutionCallback {
     private companion object {
         val MAPPER = ObjectMapper()
     }
