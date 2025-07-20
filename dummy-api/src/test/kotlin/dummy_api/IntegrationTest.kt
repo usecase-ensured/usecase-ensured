@@ -1,7 +1,7 @@
 package dummy_api
 
-import com.github.bitknot_project.progressive_testing.ProgressiveTestingExtension
-import com.github.bitknot_project.progressive_testing.TestFile
+import com.github.usecase_assured.ProgressiveTestingExtension
+import com.github.usecase_assured.Usecase
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -81,18 +81,18 @@ class IntegrationTest(
     }
 
     @Test
-    @TestFile("a-test.json")
+    @Usecase("a-test.json")
     fun `can create dummy ALT`() {}
 
     @Test
-    @TestFile("secret.json")
+    @Usecase("secret.json")
     fun `can call secret endpoint (2)`(){}
 
     @Test
-    @TestFile("multi-step.json")
+    @Usecase("multi-step.json")
     fun `can retrieve dummy (2)`() {}
 
     @Test
-    @TestFile("meta-variable.json")
+    @Usecase("meta-variable.json")
     fun `can use meta variables`() {}
 }

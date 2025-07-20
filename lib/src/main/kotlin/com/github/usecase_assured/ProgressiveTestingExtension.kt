@@ -1,10 +1,10 @@
-package com.github.bitknot_project.progressive_testing
+package com.github.usecase_assured
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.bitknot_project.progressive_testing.data.ExpectedResponse
-import com.github.bitknot_project.progressive_testing.data.Request
-import com.github.bitknot_project.progressive_testing.data.TestStep
+import com.github.usecase_assured.data.ExpectedResponse
+import com.github.usecase_assured.data.Request
+import com.github.usecase_assured.data.TestStep
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.http.Header
@@ -16,7 +16,6 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * Enables the functionality of running test cases based on external files,
@@ -37,7 +36,7 @@ class ProgressiveTestingExtension : BeforeTestExecutionCallback {
         if (maybeMethod.isPresent) {
             val method = maybeMethod.get()
 
-            val annotation = method.getAnnotation(TestFile::class.java) ?: return
+            val annotation = method.getAnnotation(Usecase::class.java) ?: return
 
             val filePath = annotation.type.pathPrefix.resolve(annotation.value)
 

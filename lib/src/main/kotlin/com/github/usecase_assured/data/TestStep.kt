@@ -1,4 +1,4 @@
-package com.github.bitknot_project.progressive_testing.data
+package com.github.usecase_assured.data
 
 import com.fasterxml.jackson.databind.JsonNode
 import java.nio.file.Path

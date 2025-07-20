@@ -1,4 +1,4 @@
-package com.github.bitknot_project.progressive_testing
+package com.github.usecase_assured
 
 import java.lang.annotation.Inherited
 import java.nio.file.Path
@@ -42,13 +42,13 @@ import java.nio.file.Paths
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 @Inherited
-annotation class TestFile(
+annotation class Usecase(
     val value: String,
     val type: FileType = FileType.POSTMAN
 )
 
 /**
- * Defines the type of data used in a [TestFile]
+ * Defines the type of data used in a [Usecase]
  * and the directory in which to put files of this type.
  *
  * - POSTMAN: `src/test/resources/postman/`
