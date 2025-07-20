@@ -1,6 +1,6 @@
 package dummy_api
 
-import com.github.usecase_assured.ProgressiveTestingExtension
+import com.github.usecase_assured.UsecaseEnsuredExtension
 import com.github.usecase_assured.Usecase
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -14,7 +14,7 @@ import org.springframework.boot.test.web.client.getForEntity
 import org.springframework.http.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@ExtendWith(ProgressiveTestingExtension::class)
+@ExtendWith(UsecaseEnsuredExtension::class)
 class IntegrationTest(
     @Autowired private val template: TestRestTemplate,
     @Autowired private val controller: DummyController,
