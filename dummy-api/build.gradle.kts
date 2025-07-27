@@ -15,14 +15,6 @@ fun property(name: String): Any? {
 
 repositories {
     mavenCentral()
-    maven {
-        url =
-            uri(property("githubPackageRepo") as String)
-        credentials {
-            username = property("githubRepoUser") as String
-            password = property("githubRepoPassword") as String
-        }
-    }
 }
 
 dependencies {
@@ -30,7 +22,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
 
-    testImplementation(project(":lib"))
+    testImplementation(project(":usecase-ensured"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.junit.jupiter:junit-jupiter:5.13.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -41,6 +33,7 @@ java {
         languageVersion = JavaLanguageVersion.of(23)
     }
 }
+
 tasks.test {
     useJUnitPlatform()
 }
