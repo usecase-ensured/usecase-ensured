@@ -1,12 +1,12 @@
 plugins {
-    kotlin("jvm")
     `java-library`
     signing
-    distribution
     `maven-publish`
+    distribution
 }
 
-version = "0.0.1"
+val projectVersion = "0.0.2"
+version = projectVersion
 group = "io.github.usecase-ensured"
 repositories {
     mavenCentral()
@@ -39,7 +39,8 @@ publishing {
     repositories {
         maven {
             name = "ossrh-staging-api"
-            url = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
+            url =
+                uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
             val uname: String? by project
             val pwd: String? by project
             credentials {
@@ -48,11 +49,12 @@ publishing {
             }
         }
     }
+
     publications {
         create<MavenPublication>("usecase-ensured") {
             groupId = group as String
             artifactId = name
-            version = "0.0.1"
+            version = projectVersion
 
             from(components["java"])
             pom {
@@ -63,7 +65,7 @@ publishing {
                 licenses {
                     license {
                         name = "MIT License"
-                        url = "https://mit-license.org/"
+                        url = "https://opensource.org/licenses/MIT"
                     }
                 }
                 developers {
@@ -86,6 +88,18 @@ signing {
     useInMemoryPgpKeys(signingKey, signingPassword)
 
     sign(publishing.publications["usecase-ensured"])
+}
+
+tasks.register<Zip>("centralZip") {
+    archiveFileName = "${project.name}-$projectVersion.zip"
+    destinationDirectory = layout.buildDirectory.dir("distributions")
+    into("io/github/usecase-ensured/usecase-ensured/$projectVersion") {
+        from("build/libs")
+        from("build/publications/usecase-ensured") {
+            rename("(.*)\\.xml(.*)", "${project.name}-$version.pom$2")
+        }
+        exclude("**/module.json*")
+    }
 }
 
 tasks.named<Test>("test") {
