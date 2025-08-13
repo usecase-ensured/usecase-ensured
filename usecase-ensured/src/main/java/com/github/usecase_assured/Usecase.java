@@ -1,8 +1,8 @@
-package com.github.usecase_assured
+package com.github.usecase_assured;
 
-import java.lang.annotation.Inherited
-import java.nio.file.Path
-import java.nio.file.Paths
+import java.lang.annotation.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * This annotation is to be used on a test method.
@@ -39,13 +39,12 @@ import java.nio.file.Paths
  * @param value The name of the file
  * @param type [FileType.POSTMAN] by default. Details in [FileType]
  */
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 @Inherited
-annotation class Usecase(
-    val value: String,
-    val type: FileType = FileType.POSTMAN
-)
+public @interface Usecase {
+    String value() default "";
+    FileType type() default FileType.POSTMAN;
 
 /**
  * Defines the type of data used in a [Usecase]
@@ -53,6 +52,12 @@ annotation class Usecase(
  *
  * - POSTMAN: `src/test/resources/postman/`
  */
-enum class FileType(val pathPrefix: Path) {
-    POSTMAN(Paths.get("src/test/resources/postman/"));
+    enum FileType {
+        POSTMAN(Paths.get("src/test/resources/postman/"));
+
+    final Path pathPrefix;
+    FileType(Path path) {
+        pathPrefix = path;
+    }
+}
 }
