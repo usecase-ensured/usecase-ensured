@@ -1,0 +1,9 @@
+<settings>
+    <servers>
+        <server>
+            <id>central</id>
+            <username>${UNAME}</username>
+            <password>${PWD}</password>
+        </server>
+    </servers>
+</settings>
