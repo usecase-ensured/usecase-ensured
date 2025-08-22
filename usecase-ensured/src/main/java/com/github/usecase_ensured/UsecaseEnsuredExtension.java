@@ -1,10 +1,10 @@
-package com.github.usecase_assured;
+package com.github.usecase_ensured;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.usecase_assured.data.ExpectedResponse;
-import com.github.usecase_assured.data.Request;
-import com.github.usecase_assured.data.TestStep;
+import com.github.usecase_ensured.data.ExpectedResponse;
+import com.github.usecase_ensured.data.Request;
+import com.github.usecase_ensured.data.TestStep;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
@@ -24,6 +24,9 @@ import java.util.stream.StreamSupport;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Enables the Usecase Ensured functionality in the annotated JUnit test class.
+ */
 public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 

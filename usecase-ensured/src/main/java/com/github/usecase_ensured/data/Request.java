@@ -1,4 +1,4 @@
-package com.github.usecase_assured.data;
+package com.github.usecase_ensured.data;
 
 import io.restassured.http.Header;
 

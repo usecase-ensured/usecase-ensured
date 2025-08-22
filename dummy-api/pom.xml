@@ -16,7 +16,7 @@
         <kotlin.code.style>official</kotlin.code.style>
         <kotlin.compiler.jvmTarget>23</kotlin.compiler.jvmTarget>
         <kotlin.compiler.jvmSource>23</kotlin.compiler.jvmSource>
-        <usecase-ensured.version>0.0.2</usecase-ensured.version>
+        <usecase-ensured.version>0.0.3</usecase-ensured.version>
     </properties>
 
     <build>
