@@ -1,7 +1,7 @@
 package dummy_api
 
-import com.github.usecase_assured.Usecase
-import com.github.usecase_assured.UsecaseEnsuredExtension
+import com.github.usecase_ensured.Usecase
+import com.github.usecase_ensured.UsecaseEnsuredExtension
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

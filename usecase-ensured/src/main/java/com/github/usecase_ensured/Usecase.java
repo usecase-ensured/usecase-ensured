@@ -1,4 +1,4 @@
-package com.github.usecase_assured;
+package com.github.usecase_ensured;
 
 import java.lang.annotation.*;
 import java.nio.file.Path;
