@@ -36,26 +36,78 @@ This reduces the amount of work you need to do in order to provide tests for the
 - Simplify work hand over between seniors and juniors. The senior explains the task and provides some tests written with Usecase Ensured, much less effort than normal tests. The
   junior then has a more solid foundation to start off from when working on the task.
 
-## Releasing a new version
+# A demonstration
+An example project that relies on Usecase Ensured is located in the `dummy-api` subdirectory.
+Let us take a tour of the central points, feel free to experiment with the finer details on your 
+own.
 
-All actions are performed in the `usecase-ensured` directory.
+Pull the Usecase Ensured dependency from:
+<https://central.sonatype.com/artifact/io.github.usecase-ensured/usecase-ensured>
 
-Run the command
-`mvn deploy -s settings.xml -DUNAME="$USERNAME" -DPWD="$PASSWORD" -Dgpg.passphrase="$PASSPHRASE"`
+Below are the contents of `IntegrationTest.kt`
+```kotlin
 
-How the above environment variables are provided is a separate topic,
-it is important that their values do not show up in the bash history.
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ExtendWith(UsecaseEnsuredExtension::class)
+class IntegrationTest(@Autowired private val controller: DummyController, ) {
 
-Instead of a global `settings.xml` a local `settings.xml` is used
-in combination with the `UNAME`and`PWD`variables.
-This way the values can be stored securely in a password manager like 1Password
-and accessed programmatically on demand.
+    @BeforeEach
+    fun teardown() {
+        controller.reset()
+    }
 
-The `gpg.passphrase` is used in order to sign the artifacts to be publish on
-<https://central.sonatype.com>
+    @Test
+    @Usecase("a-test.json")
+    fun `can create dummy ALT`() {}
 
-## Installing the library locally during development
+    @Test
+    @Usecase("secret.json")
+    fun `can call secret endpoint (2)`(){}
 
-Run the command
-`mvn install -Dgpg.passphrase=$PASSPHRASE`. The gpg keys are expected to be in
-your local gpg keychain. Currently looking for a better solution.
+    @Test
+    @Usecase("multi-step.json")
+    fun `can retrieve dummy (2)`() {}
+
+    @Test
+    @Usecase("meta-variable.json")
+    fun `can use meta variables`() {}
+}
+```
+
+The `UsecaseEnsuredExtension` is needed in order to plug the library into the
+lifecycle of your JUnit tests, without it the library is not "enabled".
+
+The `SpringBootTest` annotation is also critical. Your API tests expect to be
+run against a fully up and running instance of your program accessible at a predefined port.
+The port needs to be known in advance because it is used 
+in the definitions of our test cases **outside of any Spring Boot context**.
+
+Every relevant test method is annotated with the `Usecase` annotation.
+It accepts the file name containing the Usecase Ensured compatible test spec.
+
+Currently only Postman style collections are supported. `Usecase`'s `type` parameter
+is therefore not required. By convention, the postman compatible specs go into the
+`src/test/resources/postman` directory. 
+Further subdirectories within this one are also permitted but have to be part of the
+string in the annotation.
+
+On to the Postman collections themselves
+
+Postman's variable are **not** supported, everything needs to be static.
+
+Simply exporting a Postman collection is sufficient to make a runnable `Usecase`.
+No assertions have been defined yet though. To add assertions to a given request within
+a collection a `post response` script is added through the Postman UI, 
+it needs to have a proper structure. Here is an example:
+```javascript
+const response = {
+    "response": 201,
+    "content" : {
+        "id": "{{any}}",
+        "name": "Bob"
+    }
+}
+```
+
+The `"{{any}}"` meta variable can be used to ignore a field in assertions. The rest of
+the example is self-explanatory.
