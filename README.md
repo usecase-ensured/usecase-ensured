@@ -86,7 +86,7 @@ Every relevant test method is annotated with the `Usecase` annotation.
 It accepts the file name containing the Usecase Ensured compatible test spec.
 
 Currently only Postman style collections are supported. `Usecase`'s `type` parameter
-is therefore not required. By convention, the postman compatible specs go into the
+is therefore not required. By convention, the Postman compatible specs go into the
 `src/test/resources/postman` directory. 
 Further subdirectories within this one are also permitted but have to be part of the
 string in the annotation.
@@ -94,6 +94,9 @@ string in the annotation.
 On to the Postman collections themselves
 
 Postman's variable are **not** supported, everything needs to be static.
+
+The Postman requests need to be pointing to the URL configured for you program
+in the test setup.
 
 Simply exporting a Postman collection is sufficient to make a runnable `Usecase`.
 No assertions have been defined yet though. To add assertions to a given request within

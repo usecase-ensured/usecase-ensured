@@ -19,15 +19,15 @@ class IntegrationTest(@Autowired private val controller: DummyController, ) {
 
     @Test
     @Usecase("a-test.json")
-    fun `can create dummy ALT`() {}
+    fun `can create dummy`() {}
 
     @Test
-    @Usecase("secret.json")
-    fun `can call secret endpoint (2)`(){}
+    @Usecase("secured.json")
+    fun `can call secured endpoint`(){}
 
     @Test
     @Usecase("multi-step.json")
-    fun `can retrieve dummy (2)`() {}
+    fun `can retrieve dummy`() {}
 
     @Test
     @Usecase("meta-variable.json")
