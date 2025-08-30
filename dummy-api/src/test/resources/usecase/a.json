@@ -7,7 +7,7 @@
         "method": "POST",
         "url": "http://localhost:8080/dummy",
         "body": {
-          "name": "Bob"
+          "name": "Bon"
         },
         "headers": {
           "a": "a",

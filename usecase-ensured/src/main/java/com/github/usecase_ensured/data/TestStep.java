@@ -24,7 +24,7 @@ public record TestStep(
 
         for (var line : s.lines().toList()) {
             var trimmedLine = line.trim();
-            if (trimmedLine.startsWith("\"$fieldName\"")) {
+            if (trimmedLine.startsWith("\"%s\"".formatted(fieldName))) {
                 newS.add(line + "    <<<<<<< HERE IS THE PROBLEM");
             } else {
                 newS.add(line);
