@@ -25,14 +25,14 @@ public record TestStep(
         for (var line : s.lines().toList()) {
             var trimmedLine = line.trim();
             if (trimmedLine.startsWith("\"%s\"".formatted(fieldName))) {
-                newS.add(line + "    <<<<<<< HERE IS THE PROBLEM");
+                newS.add(line + "    <<<<<<< VERIFY THE USECASE FILE. EITHER expected OR given VALUE IS WRONG");
             } else {
                 newS.add(line);
             }
         }
 
         return """
-               %s
+               \n%s
                """.formatted(String.join(System.lineSeparator(), newS));
     }
 
