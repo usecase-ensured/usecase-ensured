@@ -22,6 +22,10 @@ class IntegrationTest(@Autowired private val controller: DummyController, ) {
     fun `can create dummy`() {}
 
     @Test
+    @Usecase("a.json", type = Usecase.FileType.USECASE)
+    fun `can create dummy (2)`() {}
+
+    @Test
     @Usecase("secured.json")
     fun `can call secured endpoint`(){}
 

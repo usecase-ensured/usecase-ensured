@@ -2,6 +2,7 @@ package com.github.usecase_ensured;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ValueNode;
 import com.github.usecase_ensured.data.ExpectedResponse;
 import com.github.usecase_ensured.data.Request;
 import com.github.usecase_ensured.data.TestStep;
@@ -40,8 +41,13 @@ public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
 
             if (annotation == null) return;
 
-            var filePath = annotation.type().pathPrefix.resolve(annotation.value());
-            var steps = buildSteps(filePath);
+            var fileType = annotation.type();
+            var filePath = fileType.pathPrefix.resolve(annotation.value());
+
+            var steps = switch (fileType) {
+                case POSTMAN -> buildStepsFromPostman(filePath);
+                case USECASE -> buildStepsFromUsecase(filePath);
+            };
 
             for (var step : steps) {
                 doRequest(step);
@@ -141,7 +147,57 @@ public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
         }
     }
 
-    private List<TestStep> buildSteps(Path path) {
+    private List<TestStep> buildStepsFromUsecase(Path path) {
+        ensureThatPathPointsToFile(path);
+
+        JsonNode json;
+        try {
+            json = MAPPER.reader().readTree(new FileInputStream(path.toFile()));
+        } catch (IOException e) {
+            throw new RuntimeException("failed to parse file '%s'. invalid JSON".formatted(path), e);
+        }
+        var entries = json.get("steps");
+        if (!entries.isArray()) {
+            throw new RuntimeException("'steps' is supposed to be an array!!!");
+        }
+
+        var steps = new ArrayList<TestStep>();
+
+        for (var entry : entries) {
+            var name = entry.requiredAt("/name").asText();
+            var method = entry.requiredAt("/given/method").asText();
+            var headersNode = entry.requiredAt("/given/headers");
+
+            var headers = headersNode.propertyStream()
+                    .map(header -> new Header(
+                            header.getKey(),
+                            header.getValue().asText()
+                    ))
+                    .toList();
+
+            var url = entry.requiredAt("/given/url").asText();
+            var bodyNode = entry.at("/given/body");
+            var body = bodyNode.isMissingNode() ? null : bodyNode.toPrettyString();
+
+            var request = new Request(
+                    Request.Method.valueOf(method),
+                    headers,
+                    url,
+                    body
+            );
+
+            var expectationNode = entry.requiredAt("/expected");
+
+            var parsedExpectedJson = new ExpectedResponse(expectationNode);
+
+            var step = new TestStep(path, name, request, parsedExpectedJson);
+            steps.add(step);
+        }
+
+        return steps;
+    }
+
+    private List<TestStep> buildStepsFromPostman(Path path) {
         ensureThatPathPointsToFile(path);
 
         JsonNode json;

@@ -1,0 +1,26 @@
+{
+  "usecase": "creation",
+  "steps": [
+    {
+      "name": "create dummy",
+      "given": {
+        "method": "POST",
+        "url": "http://localhost:8080/dummy",
+        "body": {
+          "name": "Bob"
+        },
+        "headers": {
+          "a": "a",
+          "b": "b"
+        }
+      },
+      "expected": {
+        "response": 201,
+        "content": {
+          "id": "{{any}}",
+          "name": "Bob"
+        }
+      }
+    }
+  ]
+}
