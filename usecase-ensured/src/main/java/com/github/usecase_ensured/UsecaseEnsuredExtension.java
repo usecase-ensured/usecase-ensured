@@ -16,10 +16,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.StreamSupport;
 
 import static io.restassured.RestAssured.given;
@@ -39,7 +36,9 @@ public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
             var method = maybeMethod.get();
             var annotation = method.getAnnotation(Usecase.class);
 
-            if (annotation == null) return;
+            if (annotation == null) {
+                return;
+            }
 
             var fileType = annotation.type();
             var filePath = fileType.pathPrefix.resolve(annotation.value());
@@ -166,14 +165,15 @@ public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
         for (var entry : entries) {
             var name = entry.requiredAt("/name").asText();
             var method = entry.requiredAt("/given/method").asText();
-            var headersNode = entry.requiredAt("/given/headers");
+            var headersNode = Optional.ofNullable(entry.at("/given/headers"));
 
-            var headers = headersNode.propertyStream()
-                    .map(header -> new Header(
-                            header.getKey(),
-                            header.getValue().asText()
-                    ))
-                    .toList();
+            var headers = headersNode.map(it -> it.propertyStream()
+                            .map(header -> new Header(
+                                    header.getKey(),
+                                    header.getValue().asText()
+                            ))
+                            .toList())
+                    .orElse(List.of());
 
             var url = entry.requiredAt("/given/url").asText();
             var bodyNode = entry.at("/given/body");

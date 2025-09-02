@@ -1,0 +1,32 @@
+{
+  "usecase": "multi step",
+  "steps": [
+    {
+      "name": "create dummy",
+      "given": {
+        "method": "POST",
+        "url": "http://localhost:8080/dummy",
+        "body": {
+          "name": "dummy"
+        }
+      },
+      "expected": {
+        "response": 201
+      }
+    },
+    {
+      "name": "get dummy",
+      "given": {
+        "method": "GET",
+        "url": "http://localhost:8080/dummy/0"
+      },
+      "expected": {
+        "response": 200,
+        "content": {
+          "id": 0,
+          "name": "dummy"
+        }
+      }
+    }
+  ]
+}

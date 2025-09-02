@@ -1,0 +1,18 @@
+{
+  "usecase": "secret",
+  "steps": [
+    {
+      "name": "get secret",
+      "given": {
+        "method": "GET",
+        "url": "http://localhost:8080/dummy/secret",
+        "headers": {
+          "Authorization": "Basic Ym9iOmJvYg=="
+        }
+      },
+      "expected": {
+        "response": 200
+      }
+    }
+  ]
+}
