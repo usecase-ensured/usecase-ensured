@@ -13,8 +13,8 @@
       "expected": {
         "response": 201
       },
-      "remembered": {
-        "generatedId": "{{expected.content.id}}"
+      "saved": {
+        "generatedId": "id"
       }
     },
     {
