@@ -2,10 +2,10 @@ package com.github.usecase_ensured;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ValueNode;
 import com.github.usecase_ensured.data.ExpectedResponse;
 import com.github.usecase_ensured.data.Request;
 import com.github.usecase_ensured.data.TestStep;
+import com.github.usecase_ensured.data.TestSteps;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
@@ -48,13 +48,13 @@ public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
                 case USECASE -> buildStepsFromUsecase(filePath);
             };
 
-            for (var step : steps) {
-                doRequest(step);
+            for (var step : steps.getEntries()) {
+                executeAndAssert(step);
             }
         }
     }
 
-    private void doRequest(TestStep step) {
+    private void executeAndAssert(TestStep step) {
         var builder = given();
 
         builder.baseUri(step.request().url());
@@ -146,7 +146,7 @@ public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
         }
     }
 
-    private List<TestStep> buildStepsFromUsecase(Path path) {
+    private TestSteps buildStepsFromUsecase(Path path) {
         ensureThatPathPointsToFile(path);
 
         JsonNode json;
@@ -161,6 +161,7 @@ public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
         }
 
         var steps = new ArrayList<TestStep>();
+        var rememberedMap = new HashMap<String, JsonNode>();
 
         for (var entry : entries) {
             var name = entry.requiredAt("/name").asText();
@@ -190,14 +191,21 @@ public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
 
             var parsedExpectedJson = new ExpectedResponse(expectationNode);
 
+            if (entry.hasNonNull("/remembered")) {
+                var rememberedValues = entry.at("/remembered");
+                for (var variable : rememberedValues.properties()) {
+                    rememberedMap.put(variable.getKey(), variable.getValue());
+                }
+            }
+
             var step = new TestStep(path, name, request, parsedExpectedJson);
             steps.add(step);
         }
 
-        return steps;
+        return new TestSteps(steps, rememberedMap);
     }
 
-    private List<TestStep> buildStepsFromPostman(Path path) {
+    private TestSteps buildStepsFromPostman(Path path) {
         ensureThatPathPointsToFile(path);
 
         JsonNode json;
@@ -255,7 +263,7 @@ public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
             steps.add(step);
         }
 
-        return steps;
+        return new TestSteps(steps, Map.of());
     }
 }
   

@@ -3,6 +3,7 @@ package dummy_api
 import com.github.usecase_ensured.Usecase
 import com.github.usecase_ensured.UsecaseEnsuredExtension
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -45,10 +46,6 @@ class IntegrationTest(@Autowired private val controller: DummyController) {
         }
 
         @Test
-        @Usecase("meta-variable.json", type = Usecase.FileType.USECASE)
-        fun `can use meta variables`() {}
-
-        @Test
         @Usecase("secured.json", type = Usecase.FileType.USECASE)
         fun `can call secured endpoint`() {
         }
@@ -57,6 +54,11 @@ class IntegrationTest(@Autowired private val controller: DummyController) {
         @Usecase("multi-step.json", type = Usecase.FileType.USECASE)
         fun `can retrieve dummy`() {
         }
+
+        @Disabled
+        @Test
+        @Usecase("remembered/create-then-fetch.json", type = Usecase.FileType.USECASE)
+        fun `can create and then assert on retrieve with meta variable`() {}
 
     }
 }

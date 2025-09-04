@@ -1,0 +1,35 @@
+{
+  "usecase": "multi step",
+  "steps": [
+    {
+      "name": "create dummy",
+      "given": {
+        "method": "POST",
+        "url": "http://localhost:8080/dummy",
+        "body": {
+          "name": "dummy"
+        }
+      },
+      "expected": {
+        "response": 201
+      },
+      "remembered": {
+        "generatedId": "{{expected.content.id}}"
+      }
+    },
+    {
+      "name": "get dummy",
+      "given": {
+        "method": "GET",
+        "url": "http://localhost:8080/dummy/{{remembered.generatedId}}"
+      },
+      "expected": {
+        "response": 200,
+        "content": {
+          "id": "{{remembered.generatedId}}",
+          "name": "dummy"
+        }
+      }
+    }
+  ]
+}
