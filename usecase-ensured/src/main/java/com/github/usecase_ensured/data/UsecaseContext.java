@@ -10,12 +10,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-public class UsecaseTestSteps implements TestSteps {
+public class UsecaseContext implements Context {
     private final List<TestStep> testSteps;
     private final Map<String, JsonNode> savedMap = new HashMap<>();
     private final ObjectMapper MAPPER = new ObjectMapper();
 
-    public UsecaseTestSteps(Path path) {
+    public UsecaseContext(Path path) {
         testSteps = buildStepsFromUsecase(path);
     }
 

@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class StepExecutor {
 
-    public void run(TestSteps steps) {
+    public void run(Context steps) {
         steps.getEntries().forEach(step -> executeAndAssert(step, steps.getSavedVariables()));
     }
 

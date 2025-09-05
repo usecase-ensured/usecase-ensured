@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.Map;
 
-public interface TestSteps {
+public interface Context {
     List<TestStep> getEntries();
     Map<String, JsonNode> getSavedVariables();
     void updateSavedVariables(String name, JsonNode value);

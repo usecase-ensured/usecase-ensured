@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
 
-public class PostmanTestSteps implements TestSteps {
+public class PostmanContext implements Context {
     private final List<TestStep> testSteps;
     private final ObjectMapper MAPPER = new ObjectMapper();
 
-    public PostmanTestSteps(Path path) {
+    public PostmanContext(Path path) {
         testSteps = buildStepsFromPostman(path);
     }
 

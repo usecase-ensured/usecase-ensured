@@ -1,8 +1,8 @@
 package com.github.usecase_ensured;
 
-import com.github.usecase_ensured.data.PostmanTestSteps;
+import com.github.usecase_ensured.data.PostmanContext;
 import com.github.usecase_ensured.data.StepExecutor;
-import com.github.usecase_ensured.data.UsecaseTestSteps;
+import com.github.usecase_ensured.data.UsecaseContext;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
@@ -28,8 +28,8 @@ public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
             var filePath = fileType.pathPrefix.resolve(annotation.value());
 
             var steps = switch (fileType) {
-                case POSTMAN -> new PostmanTestSteps(filePath);
-                case USECASE -> new UsecaseTestSteps(filePath);
+                case POSTMAN -> new PostmanContext(filePath);
+                case USECASE -> new UsecaseContext(filePath);
             };
 
             stepExecutor.run(steps);
