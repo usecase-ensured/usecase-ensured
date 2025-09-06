@@ -1,0 +1,36 @@
+{
+  "usecase": "create and fetch with custom syntax",
+  "steps": [
+    {
+      "name": "create",
+      "given": {
+        "method": "POST",
+        "url": "http://localhost:8080/dummy",
+        "body": {
+          "name": "Bob"
+        }
+      },
+      "expected": {
+        "statusCode": 201,
+        "body": {
+          "name": "Bob",
+          "id": "{{any}}"
+        }
+      }
+    },
+    {
+      "name": "fetch",
+      "given": {
+        "method": "GET",
+        "url": "http://localhost:8080/dummy/0"
+      },
+      "expected": {
+        "statusCode": 200,
+        "body": {
+          "name": "Bob",
+          "id": 0
+        }
+      }
+    }
+  ]
+}

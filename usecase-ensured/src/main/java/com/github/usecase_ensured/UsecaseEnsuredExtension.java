@@ -2,9 +2,11 @@ package com.github.usecase_ensured;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.usecase_ensured.data.ExpectedResponse;
-import com.github.usecase_ensured.data.Request;
-import com.github.usecase_ensured.data.TestStep;
+import com.github.usecase_ensured.internal.ExpectedResponse;
+import com.github.usecase_ensured.internal.Request;
+import com.github.usecase_ensured.internal.TestStep;
+import com.github.usecase_ensured.internal.runner.Context;
+import com.github.usecase_ensured.internal.runner.Runner;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
@@ -29,10 +31,11 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Runner runner = new Runner();
 
     @Override
-    public void beforeTestExecution(ExtensionContext context) {
-        var maybeMethod = context.getTestMethod();
+    public void beforeTestExecution(ExtensionContext junitContext) {
+        var maybeMethod = junitContext.getTestMethod();
 
         if (maybeMethod.isPresent()) {
             var method = maybeMethod.get();
@@ -40,12 +43,22 @@ public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
 
             if (annotation == null) return;
 
-            var filePath = annotation.type().pathPrefix.resolve(annotation.value());
-            var steps = buildSteps(filePath);
-
-            for (var step : steps) {
-                doRequest(step);
+            if (annotation.type() == Usecase.FileType.POSTMAN) {
+                runPostmanCollection(annotation);
+                return; // FIXME: short-term code while refactoring
             }
+
+            var context = Context.configureWith(annotation);
+            runner.runWith(context);
+        }
+    }
+
+    private void runPostmanCollection(Usecase annotation) {
+        var filePath = annotation.type().pathPrefix.resolve(annotation.value());
+        var steps = buildSteps(filePath);
+
+        for (var step : steps) {
+            doRequest(step);
         }
     }
 
