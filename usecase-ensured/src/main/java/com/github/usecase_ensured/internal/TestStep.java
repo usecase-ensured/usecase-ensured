@@ -1,6 +1,9 @@
 package com.github.usecase_ensured.internal;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.*;
 import com.github.usecase_ensured.internal.runner.Context;
 import io.restassured.response.Response;
 
@@ -9,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -65,6 +69,9 @@ public record TestStep(
     }
 
     private List<Assertion> createFieldAssertions(JsonNode expectedNode, JsonNode actualNode) {
+        if (expectedNode.isValueNode()) {
+            return List.of(() -> assertEquals(expectedNode, actualNode, this.asTraceHint()));
+        }
         var acc = new ArrayList<Assertion>();
         var actualValueMap = new HashMap<String, JsonNode>();
 

@@ -34,7 +34,7 @@ class DummyController {
 
     @GetMapping("secret")
     fun getSecret() : String {
-        return "this is a secret"
+        return "\"this is a secret\""
     }
 
     @GetMapping("all")

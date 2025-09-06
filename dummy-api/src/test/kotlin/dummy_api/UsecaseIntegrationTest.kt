@@ -11,5 +11,12 @@ import org.springframework.boot.test.context.SpringBootTest
 class UsecaseIntegrationTest {
     @Test
     @Usecase("create-and-fetch.json", type = Usecase.FileType.USECASE)
-    fun `can create and fetch`(){}
+    fun `can create and fetch`() {
+    }
+
+    @Test
+    @Usecase("secure.json", type = Usecase.FileType.USECASE)
+    fun `can access secure endpoint`() {
+    }
+
 }

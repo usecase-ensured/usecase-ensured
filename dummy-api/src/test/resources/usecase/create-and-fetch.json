@@ -1,5 +1,5 @@
 {
-  "usecase": "create and fetch with custom syntax",
+  "name": "create and fetch with custom syntax",
   "steps": [
     {
       "name": "create",
