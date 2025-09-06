@@ -26,7 +26,7 @@ public class UsecaseContext extends Context {
             var name = usecaseStep.required("name").asText();
 
             var given = new Request(usecaseStep.required("given"));
-            var expected = new ExpectedResponse(usecaseStep.optional("expected").orElse(NullNode.instance));
+            var expected = new ExpectedResponse(usecaseStep.optional("then").orElse(NullNode.instance));
 
             var step = new TestStep(sourceFile, name, given, expected);
             steps.add(step);

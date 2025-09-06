@@ -10,7 +10,7 @@
           "Authorization": "Basic Ym9iOmJvYg=="
         }
       },
-      "expected": {
+      "then": {
         "statusCode": 200,
         "body": "this is a secret"
       }

@@ -10,7 +10,7 @@
           "name": "Bob"
         }
       },
-      "expected": {
+      "then": {
         "statusCode": 201,
         "body": {
           "name": "Bob",
@@ -24,7 +24,7 @@
         "method": "GET",
         "url": "http://localhost:8080/dummy/0"
       },
-      "expected": {
+      "then": {
         "statusCode": 200,
         "body": {
           "name": "Bob",
