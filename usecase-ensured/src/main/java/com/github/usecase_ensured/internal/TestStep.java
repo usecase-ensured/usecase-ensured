@@ -1,9 +1,6 @@
 package com.github.usecase_ensured.internal;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.*;
 import com.github.usecase_ensured.internal.runner.Context;
 import io.restassured.response.Response;
 
@@ -12,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,23 +54,26 @@ public record TestStep(
             var expected = expectedResponse().expectedResponse().optional("body");
             if (expected.isPresent()) {
                 var actual = response.body().as(JsonNode.class);
-                var fieldAssertions = createFieldAssertions(expected.get(), actual);
-                fieldAssertions.forEach(Assertion::run);
+                for (var assertion : generateAssertions(expected.get(), actual)) {
+                    assertion.execute();
+                }
             }
         }
     }
 
     @FunctionalInterface
-    private interface Assertion extends Runnable {
+    private interface Assertion {
+        void execute();
     }
 
-    private List<Assertion> createFieldAssertions(JsonNode expectedNode, JsonNode actualNode) {
+    private List<Assertion> generateAssertions(JsonNode expectedNode, JsonNode actualNode) {
         if (expectedNode.isValueNode()) {
             return List.of(() -> assertEquals(expectedNode, actualNode, this.asTraceHint()));
         }
-        var acc = new ArrayList<Assertion>();
-        var actualValueMap = new HashMap<String, JsonNode>();
 
+        var assertions = new ArrayList<Assertion>();
+
+        var actualValueMap = new HashMap<String, JsonNode>();
         actualNode.properties().forEach(entry ->
                 actualValueMap.put(entry.getKey(), entry.getValue())
         );
@@ -84,17 +83,19 @@ public record TestStep(
                 expectedValueMap.put(entry.getKey(), entry.getValue())
         );
 
-        var unexpectedFields = new HashSet<>(expectedValueMap.keySet());
-        unexpectedFields.removeAll(actualValueMap.keySet());
+        var fieldsNotPresentInActualResponse = new HashSet<>(expectedValueMap.keySet());
+        fieldsNotPresentInActualResponse.removeAll(actualValueMap.keySet());
 
-        var extraFields = new HashSet<>(actualValueMap.keySet());
-        extraFields.removeAll(expectedValueMap.keySet());
-        unexpectedFields.addAll(extraFields);
+        var fieldsNotPresentInExpectation = new HashSet<>(actualValueMap.keySet());
+        fieldsNotPresentInExpectation.removeAll(expectedValueMap.keySet());
+
+        var unexpectedFields = new HashSet<String>();
+        unexpectedFields.addAll(fieldsNotPresentInExpectation);
+        unexpectedFields.addAll(fieldsNotPresentInActualResponse);
 
         if (!unexpectedFields.isEmpty()) {
-            return List.of(() ->
-                    fail("%s: unexpected fields %s present".formatted(this.asTraceHint(), unexpectedFields))
-            );
+            return List.of(
+                    () -> fail("%s: unexpected fields %s present".formatted(this.asTraceHint(), unexpectedFields)));
         }
 
         actualNode.properties().forEach(entry -> {
@@ -104,13 +105,13 @@ public record TestStep(
             var metaAssertion = metaVariableAssertion(expected, actualNode, fieldName);
 
             if (metaAssertion == null) {
-                acc.add(() -> assertEquals(expected, actual, this.asTraceHint(fieldName, actualNode)));
+                assertions.add(() -> assertEquals(expected, actual, this.asTraceHint(fieldName, actualNode)));
             } else {
-                acc.add(metaAssertion);
+                assertions.add(metaAssertion);
             }
         });
 
-        return acc;
+        return assertions;
     }
 
     private Assertion metaVariableAssertion(JsonNode expected, JsonNode actualJson, String actualFieldName) {
