@@ -18,7 +18,7 @@ class UsecaseRequest extends Request {
                 readHeaders(json.at("/headers")),
                 json.required("url").asText(),
                 json.optional("body").map(JsonNode::toPrettyString).orElse(null),
-                json.optional("saved").orElse(null)
+                json.at("/saved")
         );
     }
 

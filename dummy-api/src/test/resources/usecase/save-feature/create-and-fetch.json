@@ -31,7 +31,7 @@
         "statusCode": 200,
         "body": {
           "name": "Bob",
-          "id": 0
+          "id": "{{saved.generatedId}}"
         }
       }
     }

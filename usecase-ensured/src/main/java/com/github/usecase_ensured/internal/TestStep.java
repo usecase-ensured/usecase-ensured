@@ -13,7 +13,7 @@ public abstract class TestStep {
     protected final Path filePath;
     protected final String name;
     protected final Request request;
-    protected final ExpectedResponse expectedResponse;
+    protected ExpectedResponse expectedResponse;
 
     public Path filePath() {
         return filePath;
@@ -64,8 +64,14 @@ public abstract class TestStep {
     }
 
     protected abstract Optional<JsonNode> expectedStatusCodeJsonNode();
+
     protected abstract Optional<JsonNode> expectedBodyJsonNode();
-    protected void updateSavedMetaVariables(JsonNode actualResponse){}
+
+    protected void updateSavedMetaVariables(JsonNode actualResponse) {
+    }
+
+    protected void resolveMetaVariables() {
+    }
 
     public void assertOn(Response response, Context context) {
         if (expectedResponse != null) {
@@ -78,7 +84,9 @@ public abstract class TestStep {
             var expected = expectedBodyJsonNode();
             if (expected.isPresent()) {
                 var actual = response.body().as(JsonNode.class);
+
                 updateSavedMetaVariables(actual);
+                resolveMetaVariables();
 
                 for (var assertion : generateAssertions(expected.get(), actual)) {
                     assertion.execute();
