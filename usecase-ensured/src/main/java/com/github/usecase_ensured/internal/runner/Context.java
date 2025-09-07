@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.usecase_ensured.Usecase;
 import com.github.usecase_ensured.internal.TestStep;
+import com.github.usecase_ensured.internal.runner.usecase.UsecaseContext;
 
 import java.io.FileInputStream;
 import java.io.IOException;

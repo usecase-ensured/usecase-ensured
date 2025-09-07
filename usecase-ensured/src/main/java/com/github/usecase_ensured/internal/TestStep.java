@@ -5,19 +5,39 @@ import com.github.usecase_ensured.internal.runner.Context;
 import io.restassured.response.Response;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public record TestStep(
-        Path filePath,
-        String name,
-        Request request,
-        ExpectedResponse expectedResponse
-) {
+public abstract class TestStep {
+    protected final Path filePath;
+    protected final String name;
+    protected final Request request;
+    protected final ExpectedResponse expectedResponse;
+
+    public Path filePath() {
+        return filePath;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public Request request() {
+        return request;
+    }
+
+    public ExpectedResponse expectedResponse() {
+        return expectedResponse;
+    }
+
+    public TestStep(Path filePath, String name, Request request, ExpectedResponse expectedResponse) {
+        this.filePath = filePath;
+        this.name = name;
+        this.request = request;
+        this.expectedResponse = expectedResponse;
+    }
+
     public String asTraceHint() {
         return "STEP [%s] FILE [%s]".formatted(name, filePath);
     }
@@ -43,15 +63,18 @@ public record TestStep(
                """.formatted(String.join(System.lineSeparator(), newS));
     }
 
+    public abstract Optional<JsonNode> expectedStatusCodeJsonNode();
+    public abstract Optional<JsonNode> expectedBodyJsonNode();
+
     public void assertOn(Response response, Context context) {
-        if (expectedResponse() != null) {
-            var expectedStatusCode = expectedResponse().expectedResponse().optional("statusCode");
+        if (expectedResponse != null) {
+            var expectedStatusCode = expectedStatusCodeJsonNode();
             if (expectedStatusCode.isPresent()) {
                 var msg = "invalid HTTP status: " + asTraceHint();
                 assertEquals(expectedStatusCode.get().asInt(), response.statusCode(), msg);
             }
 
-            var expected = expectedResponse().expectedResponse().optional("body");
+            var expected = expectedBodyJsonNode();
             if (expected.isPresent()) {
                 var actual = response.body().as(JsonNode.class);
                 for (var assertion : generateAssertions(expected.get(), actual)) {
@@ -62,11 +85,11 @@ public record TestStep(
     }
 
     @FunctionalInterface
-    private interface Assertion {
+    protected interface Assertion {
         void execute();
     }
 
-    private List<Assertion> generateAssertions(JsonNode expectedNode, JsonNode actualNode) {
+    protected List<Assertion> generateAssertions(JsonNode expectedNode, JsonNode actualNode) {
         if (expectedNode.isValueNode()) {
             return List.of(() -> assertEquals(expectedNode, actualNode, this.asTraceHint()));
         }
@@ -114,7 +137,7 @@ public record TestStep(
         return assertions;
     }
 
-    private Assertion metaVariableAssertion(JsonNode expected, JsonNode actualJson, String actualFieldName) {
+    protected Assertion metaVariableAssertion(JsonNode expected, JsonNode actualJson, String actualFieldName) {
         if (expected.isTextual() && "{{any}}".equals(expected.asText())) {
             return () -> assertTrue(true, this.asTraceHint(actualFieldName, actualJson));
         }

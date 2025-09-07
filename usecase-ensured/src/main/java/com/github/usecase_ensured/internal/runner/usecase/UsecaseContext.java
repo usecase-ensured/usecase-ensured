@@ -1,17 +1,21 @@
-package com.github.usecase_ensured.internal.runner;
+package com.github.usecase_ensured.internal.runner.usecase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.github.usecase_ensured.internal.ExpectedResponse;
 import com.github.usecase_ensured.internal.Request;
 import com.github.usecase_ensured.internal.TestStep;
+import com.github.usecase_ensured.internal.runner.Context;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UsecaseContext extends Context {
     public List<TestStep> steps;
+    private final Map<String, JsonNode> savedMetaVariables = new HashMap<>();
 
     public UsecaseContext(Path sourceFile) {
         var usecaseJson = read(sourceFile);
@@ -28,7 +32,7 @@ public class UsecaseContext extends Context {
             var given = new Request(usecaseStep.required("given"));
             var expected = new ExpectedResponse(usecaseStep.optional("then").orElse(NullNode.instance));
 
-            var step = new TestStep(sourceFile, name, given, expected);
+            var step = new UsecaseStep(sourceFile, name, given, expected);
             steps.add(step);
         }
 

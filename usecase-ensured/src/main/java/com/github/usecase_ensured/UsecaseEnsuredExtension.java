@@ -7,6 +7,7 @@ import com.github.usecase_ensured.internal.Request;
 import com.github.usecase_ensured.internal.TestStep;
 import com.github.usecase_ensured.internal.runner.Context;
 import com.github.usecase_ensured.internal.runner.Runner;
+import com.github.usecase_ensured.internal.runner.postman.PostmanStep;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
@@ -208,7 +209,7 @@ public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
                 throw new RuntimeException("Failed to parse expected JSON", e);
             }
 
-            var step = new TestStep(path, name, request, parsedExpectedJson);
+            var step = new PostmanStep(path, name, request, parsedExpectedJson);
             steps.add(step);
         }
 
