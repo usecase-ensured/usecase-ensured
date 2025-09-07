@@ -7,6 +7,7 @@ import com.github.usecase_ensured.internal.Request;
 import com.github.usecase_ensured.internal.TestStep;
 import com.github.usecase_ensured.internal.runner.Context;
 import com.github.usecase_ensured.internal.runner.Runner;
+import com.github.usecase_ensured.internal.runner.postman.PostmanRequest;
 import com.github.usecase_ensured.internal.runner.postman.PostmanStep;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
@@ -186,7 +187,7 @@ public class UsecaseEnsuredExtension implements BeforeTestExecutionCallback {
             var bodyNode = entry.at("/request/body/raw");
             var body = bodyNode.isMissingNode() ? null : bodyNode.asText();
 
-            var request = new Request(
+            var request = new PostmanRequest(
                     Request.Method.valueOf(method),
                     headers,
                     url,

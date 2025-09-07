@@ -8,19 +8,30 @@ import com.github.usecase_ensured.internal.TestStep;
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class UsecaseStep extends TestStep {
+class UsecaseStep extends TestStep {
+    private UsecaseContext context;
 
-    public UsecaseStep(Path filePath, String name, Request request, ExpectedResponse expectedResponse) {
+    UsecaseStep(UsecaseContext context,
+                       Path filePath,
+                       String name,
+                       Request request,
+                       ExpectedResponse expectedResponse) {
         super(filePath, name, request, expectedResponse);
+        this.context = context;
     }
 
     @Override
-    public Optional<JsonNode> expectedStatusCodeJsonNode() {
+    protected Optional<JsonNode> expectedStatusCodeJsonNode() {
         return expectedResponse.expectedResponse().optional("statusCode");
     }
 
     @Override
-    public Optional<JsonNode> expectedBodyJsonNode() {
+    protected Optional<JsonNode> expectedBodyJsonNode() {
         return expectedResponse.expectedResponse().optional("body");
+    }
+
+    @Override
+    protected void updateSavedMetaVariables(JsonNode actualResponse) {
+
     }
 }

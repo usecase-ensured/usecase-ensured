@@ -29,10 +29,10 @@ public class UsecaseContext extends Context {
         for (var usecaseStep : json.required("steps")) {
             var name = usecaseStep.required("name").asText();
 
-            var given = new Request(usecaseStep.required("given"));
+            var given = new UsecaseRequest(usecaseStep.required("given"));
             var expected = new ExpectedResponse(usecaseStep.optional("then").orElse(NullNode.instance));
 
-            var step = new UsecaseStep(sourceFile, name, given, expected);
+            var step = new UsecaseStep(this, sourceFile, name, given, expected);
             steps.add(step);
         }
 

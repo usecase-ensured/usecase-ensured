@@ -63,8 +63,9 @@ public abstract class TestStep {
                """.formatted(String.join(System.lineSeparator(), newS));
     }
 
-    public abstract Optional<JsonNode> expectedStatusCodeJsonNode();
-    public abstract Optional<JsonNode> expectedBodyJsonNode();
+    protected abstract Optional<JsonNode> expectedStatusCodeJsonNode();
+    protected abstract Optional<JsonNode> expectedBodyJsonNode();
+    protected void updateSavedMetaVariables(JsonNode actualResponse){}
 
     public void assertOn(Response response, Context context) {
         if (expectedResponse != null) {
@@ -77,6 +78,8 @@ public abstract class TestStep {
             var expected = expectedBodyJsonNode();
             if (expected.isPresent()) {
                 var actual = response.body().as(JsonNode.class);
+                updateSavedMetaVariables(actual);
+
                 for (var assertion : generateAssertions(expected.get(), actual)) {
                     assertion.execute();
                 }
