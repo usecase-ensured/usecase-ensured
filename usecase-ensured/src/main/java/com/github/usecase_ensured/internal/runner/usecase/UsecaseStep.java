@@ -39,17 +39,21 @@ class UsecaseStep extends TestStep {
         var savedVariables = ((UsecaseRequest) request).savedVariables();
 
         for (var savedVariable : savedVariables.properties()) {
-            String metaVariablePath = savedVariable.getValue().textValue();
-            var jsonPath = asJsonPath(trimBraces(metaVariablePath));
-            var responseValue = actualResponse.at(jsonPath);
+            if (looksLikeMetaVariable(savedVariable.getValue())) {
+                String metaVariablePath = savedVariable.getValue().textValue();
+                var jsonPath = asJsonPath(trimBraces(metaVariablePath));
+                var responseValue = actualResponse.at(jsonPath);
 
-            if (responseValue.isMissingNode()) {
-                throw new RuntimeException(
-                        "invalid saved variable definition, reference is not valid: {{%s}}".formatted(
-                                metaVariablePath));
+                if (responseValue.isMissingNode()) {
+                    throw new RuntimeException(
+                            "invalid saved variable definition, reference is not valid: {{%s}}".formatted(
+                                    metaVariablePath));
+                }
+
+                context.updateSavedVariables(savedVariable.getKey(), responseValue);
+            } else {
+                context.updateSavedVariables(savedVariable.getKey(), savedVariable.getValue());
             }
-
-            context.updateSavedVariables(savedVariable.getKey(), responseValue);
         }
     }
 

@@ -34,6 +34,10 @@ class UsecaseIntegrationTest(@Autowired private val controller: DummyController)
         @Usecase("save-feature/create-and-fetch.json", type = Usecase.FileType.USECASE)
         fun `can create and fetch with saved variable assertion`() {
         }
+
+        @Test
+        @Usecase("save-feature/create-detailed.json", type = Usecase.FileType.USECASE)
+        fun `can use saved meta variables in nested JSON`(){}
     }
 
 }
