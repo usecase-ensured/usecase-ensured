@@ -1,15 +1,11 @@
 package com.github.usecase_ensured.internal.runner.usecase;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.usecase_ensured.internal.ExpectedResponse;
 import com.github.usecase_ensured.internal.TestStep;
 
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Optional;
 
 class UsecaseStep extends TestStep {
