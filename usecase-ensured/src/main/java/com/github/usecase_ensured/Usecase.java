@@ -50,9 +50,10 @@ public @interface Usecase {
      * </ul>
      */
     enum FileType {
-        POSTMAN(Paths.get("src/test/resources/postman/"));
+        POSTMAN(Paths.get("src/test/resources/postman/")),
+        USECASE(Paths.get("src/test/resources/usecase"));
 
-        final Path pathPrefix;
+        public final Path pathPrefix;
 
         FileType(Path path) {
             pathPrefix = path;

@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ExtendWith(UsecaseEnsuredExtension::class)
-class IntegrationTest(@Autowired private val controller: DummyController, ) {
+class PostmanIntegrationTest(@Autowired private val controller: DummyController, ) {
 
     @BeforeEach
     fun teardown() {

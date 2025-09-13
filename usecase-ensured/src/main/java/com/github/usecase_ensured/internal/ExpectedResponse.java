@@ -1,4 +1,4 @@
-package com.github.usecase_ensured.data;
+package com.github.usecase_ensured.internal;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
