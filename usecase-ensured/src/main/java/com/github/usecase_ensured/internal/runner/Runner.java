@@ -19,7 +19,7 @@ public class Runner {
 
             var response = requestBuilder.request(step.request().method().name());
 
-            step.assertOn(response, context);
+            step.assertOn(response);
         }
 
     }

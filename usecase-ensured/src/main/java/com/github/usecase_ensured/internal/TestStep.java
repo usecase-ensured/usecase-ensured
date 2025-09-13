@@ -1,7 +1,6 @@
 package com.github.usecase_ensured.internal;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.usecase_ensured.internal.runner.Context;
 import io.restassured.response.Response;
 
 import java.nio.file.Path;
@@ -14,10 +13,6 @@ public abstract class TestStep {
     protected final String name;
     protected final Request request;
     protected ExpectedResponse expectedResponse;
-
-    public Path filePath() {
-        return filePath;
-    }
 
     public String name() {
         return name;
@@ -67,13 +62,21 @@ public abstract class TestStep {
 
     protected abstract Optional<JsonNode> expectedBodyJsonNode();
 
+    /**
+     * Updates the {@link com.github.usecase_ensured.internal.runner.Context} with the meta variables introduced in this
+     * {@link TestStep}.
+     */
     protected void updateSavedMetaVariables(JsonNode actualResponse) {
     }
 
+    /**
+     * Retrieves the values of meta variables from the {@link com.github.usecase_ensured.internal.runner.Context}
+     * and applies them to the parts of the expected response where they are referenced.
+     */
     protected void resolveMetaVariables() {
     }
 
-    public void assertOn(Response response, Context context) {
+    public void assertOn(Response response) {
         if (expectedResponse != null) {
             var expectedStatusCode = expectedStatusCodeJsonNode();
             if (expectedStatusCode.isPresent()) {

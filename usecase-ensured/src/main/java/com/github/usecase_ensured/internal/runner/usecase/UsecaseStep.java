@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 class UsecaseStep extends TestStep {
-    private UsecaseContext context;
+    private final UsecaseContext context;
 
     UsecaseStep(UsecaseContext context,
                 Path filePath,
