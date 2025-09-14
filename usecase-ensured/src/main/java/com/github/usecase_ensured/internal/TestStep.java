@@ -1,6 +1,7 @@
 package com.github.usecase_ensured.internal;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.restassured.http.Header;
 import io.restassured.response.Response;
 
 import java.nio.file.Path;
@@ -25,6 +26,8 @@ public abstract class TestStep {
     public ExpectedResponse expectedResponse() {
         return expectedResponse;
     }
+
+    public abstract List<Header> headers();
 
     public TestStep(Path filePath, String name, Request request, ExpectedResponse expectedResponse) {
         this.filePath = filePath;

@@ -2,6 +2,7 @@ package com.github.usecase_ensured.internal.runner;
 
 import io.restassured.http.ContentType;
 import io.restassured.http.Headers;
+import io.restassured.http.Method;
 
 import static io.restassured.RestAssured.given;
 

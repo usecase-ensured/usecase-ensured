@@ -3,7 +3,7 @@
   "steps": [
     {
       "name": "create",
-      "given": {
+      "do": {
         "method": "POST",
         "url": "http://localhost:8080/dummy",
         "body": {
@@ -20,7 +20,7 @@
     },
     {
       "name": "fetch",
-      "given": {
+      "do": {
         "method": "GET",
         "url": "http://localhost:8080/dummy/0"
       },

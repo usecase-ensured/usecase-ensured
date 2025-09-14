@@ -1,38 +1,63 @@
 package com.github.usecase_ensured.internal.runner.usecase;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.usecase_ensured.internal.Request;
-import io.restassured.http.Header;
-
-import java.util.List;
+import io.restassured.http.Headers;
 
 class UsecaseRequest extends Request {
     private final JsonNode savedVariables;
-    protected UsecaseRequest(Method method, List<Header> headers, String url, String body, JsonNode savedVariables) {
-        super(method, headers, url, body);
-        this.savedVariables = savedVariables;
-    }
+    private final UsecaseContext context;
+    private final String metaVariableRegex = ".*\\{\\{.+}}.*";
 
-    UsecaseRequest(JsonNode json) {
-        this(Method.valueOf(json.requiredAt("/method").asText()),
-                readHeaders(json.at("/headers")),
-                json.required("url").asText(),
-                json.optional("body").map(JsonNode::toPrettyString).orElse(null),
-                json.at("/saved")
-        );
+    protected UsecaseRequest(JsonNode request, UsecaseContext context) {
+        super(request);
+        this.savedVariables = request.at("/saved");
+        this.context = context;
     }
 
     public JsonNode savedVariables() {
         return savedVariables;
     }
 
-    private static List<Header> readHeaders(JsonNode json) {
-        if (json.isMissingNode()) {
-            return List.of();
+    @Override
+    public String url() {
+        var urlNode = (TextNode) request.required("url");
+        var resolvedString = new StringBuilder();
+        if (containsMetaVariable(urlNode)) {
+            String url = urlNode.asText();
+            var metaVariablesAsSeparators = url.splitWithDelimiters(metaVariableRegex, -1);
+
+            for (var part : metaVariablesAsSeparators) {
+                if (isMetaVariable(part)) {
+                    resolvedString.append(context.getVariable(part));
+                } else {
+                    resolvedString.append(part);
+                }
+            }
         }
-        return json.propertyStream()
-                .map(it -> new Header(it.getKey(), it.getValue().asText()))
-                .toList();
+        return resolvedString.toString();
     }
 
+    @Override
+    public String body() {
+        return "";
+    }
+
+    @Override
+    public Headers headers() {
+        return null;
+    }
+
+    @Override
+    public String method() {
+        return "";
+    }
+
+    private boolean containsMetaVariable(JsonNode json) {
+        return json.isTextual() && json.textValue().matches(metaVariableRegex);
+    }
+    private boolean isMetaVariable(String str) {
+        return str.startsWith("{{") && str.endsWith("}}");
+    }
 }

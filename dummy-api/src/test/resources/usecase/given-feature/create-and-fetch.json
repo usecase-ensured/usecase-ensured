@@ -1,23 +1,26 @@
 {
   "name": "create and fetch with custom syntax",
+  "given": {
+    "baseUrl": "http://localhost:8080/dummy"
+  },
   "steps": [
     {
       "name": "create",
       "do": {
         "method": "POST",
-        "url": "http://localhost:8080/dummy",
+        "url": "{{given.baseUrl}}",
         "body": {
           "name": "Bob"
         },
         "saved": {
-          "generatedId": "{{id}}"
+          "id": "{{id}}"
         }
       },
       "then": {
         "statusCode": 201,
         "body": {
           "name": "Bob",
-          "id": "{{saved.generatedId}}"
+          "id": "{{saved.id}}"
         }
       }
     },
@@ -25,13 +28,13 @@
       "name": "fetch",
       "do": {
         "method": "GET",
-        "url": "http://localhost:8080/dummy/0"
+        "url": "{{given.baseUrl}}/{{saved.id}}"
       },
       "then": {
         "statusCode": 200,
         "body": {
           "name": "Bob",
-          "id": "{{saved.generatedId}}"
+          "id": 0
         }
       }
     }

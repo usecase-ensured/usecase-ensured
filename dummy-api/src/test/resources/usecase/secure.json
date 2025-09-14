@@ -3,7 +3,7 @@
   "steps": [
     {
       "name": "call secure endpoint",
-      "given": {
+      "do": {
         "method": "GET",
         "url": "http://localhost:8080/dummy/secret",
         "headers": {

@@ -3,7 +3,7 @@
   "steps": [
     {
       "name": "create detailed dummy -- save JSON value node",
-      "given": {
+      "do": {
         "method": "POST",
         "url": "http://localhost:8080/dummy/detailed",
         "body": {
@@ -33,7 +33,7 @@
     },
     {
       "name": "create detailed dummy -- save JSON object node",
-      "given": {
+      "do": {
         "method": "POST",
         "url": "http://localhost:8080/dummy/detailed",
         "body": {
@@ -60,7 +60,7 @@
     },
     {
       "name": "create detailed dummy -- save primitive value",
-      "given": {
+      "do": {
         "method": "POST",
         "url": "http://localhost:8080/dummy/detailed",
         "body": {

@@ -20,24 +20,33 @@ class UsecaseIntegrationTest(@Autowired private val controller: DummyController)
 
     @Test
     @Usecase("create-and-fetch.json", type = Usecase.FileType.USECASE)
-    fun `can create and fetch`() {
+    fun `create and fetch`() {
     }
 
     @Test
     @Usecase("secure.json", type = Usecase.FileType.USECASE)
-    fun `can access secure endpoint`() {
+    fun `access secure endpoint`() {
     }
 
     @Nested
     inner class SavedFeatureTestSuite {
         @Test
         @Usecase("save-feature/create-and-fetch.json", type = Usecase.FileType.USECASE)
-        fun `can create and fetch with saved variable assertion`() {
+        fun `create and fetch with saved variable assertion`() {
         }
 
         @Test
         @Usecase("save-feature/create-detailed.json", type = Usecase.FileType.USECASE)
-        fun `can use saved meta variables in nested JSON`(){}
+        fun `use saved meta variables in nested JSON`() {
+        }
+    }
+
+    @Nested
+    inner class GivenFeatureTestSuite {
+        @Test
+        @Usecase("given-feature/create-and-fetch.json", type = Usecase.FileType.USECASE)
+        fun `define meta variables outside of test steps and use them throughout the usecase`() {
+        }
     }
 
 }

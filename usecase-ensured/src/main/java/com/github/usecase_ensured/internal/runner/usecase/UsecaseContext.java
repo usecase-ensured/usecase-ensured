@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.usecase_ensured.internal.ExpectedResponse;
-import com.github.usecase_ensured.internal.Request;
 import com.github.usecase_ensured.internal.TestStep;
 import com.github.usecase_ensured.internal.runner.Context;
 
@@ -17,11 +16,24 @@ import java.util.Map;
 public class UsecaseContext extends Context {
     public List<TestStep> steps;
     private final Map<String, JsonNode> savedMetaVariables = new HashMap<>();
+    private final Map<String, JsonNode> givenMetaVariables = new HashMap<>();
 
     public UsecaseContext(Path sourceFile) {
         var usecaseJson = read(sourceFile);
 
+        loadGivenMetaVariables(usecaseJson);
         steps = List.copyOf(prepareSteps(usecaseJson, sourceFile));
+    }
+
+    private void loadGivenMetaVariables(JsonNode json) {
+        var givenNode = json.optional("given");
+
+        if (givenNode.isPresent()) {
+            for (var property : givenNode.get().properties()) {
+                givenMetaVariables.put(property.getKey(), property.getValue());
+            }
+        }
+
     }
 
     private List<TestStep> prepareSteps(JsonNode json, Path sourceFile) {
@@ -30,7 +42,7 @@ public class UsecaseContext extends Context {
         for (var usecaseStep : json.required("steps")) {
             var name = usecaseStep.required("name").asText();
 
-            var given = new UsecaseRequest(usecaseStep.required("given"));
+            var given = new UsecaseRequest(usecaseStep.required("do"), this);
             var expected = new ExpectedResponse(usecaseStep.optional("then").orElse(NullNode.instance));
 
             var step = new UsecaseStep(this, sourceFile, name, given, expected);
@@ -50,11 +62,11 @@ public class UsecaseContext extends Context {
     }
 
     public JsonNode getVariable(String metaVariable) {
-        if (metaVariable.equals("any")) {
+        if (metaVariable.equals("{{any}}")) {
             return TextNode.valueOf("{{any}}");
         }
 
-        var parts = metaVariable.split("\\.", 2);
+        var parts = trimBraces(metaVariable).split("\\.", 2);
 
         var invalidMetaVariablePath = new RuntimeException("invalid meta variable classifier parts[0]");
 
@@ -62,9 +74,21 @@ public class UsecaseContext extends Context {
             throw invalidMetaVariablePath;
         }
 
-        return switch (parts[0]) {
+        var metaVariableValue = switch (parts[0]) {
             case "saved" -> savedMetaVariables.get(parts[1]);
+            case "given" -> givenMetaVariables.get(parts[1]);
             default -> throw invalidMetaVariablePath;
         };
+
+        if (metaVariableValue == null) {
+            throw new RuntimeException("undefined meta variable %s".formatted(metaVariableValue));
+        }
+
+        return metaVariableValue;
     }
+
+    private String trimBraces(String metaVariable) {
+        return metaVariable.substring(2, metaVariable.length() - 2);
+    }
+
 }

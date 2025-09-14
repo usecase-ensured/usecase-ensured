@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.usecase_ensured.internal.ExpectedResponse;
 import com.github.usecase_ensured.internal.TestStep;
+import io.restassured.http.Header;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 class UsecaseStep extends TestStep {
@@ -18,6 +20,12 @@ class UsecaseStep extends TestStep {
                 ExpectedResponse expectedResponse) {
         super(filePath, name, request, expectedResponse);
         this.context = context;
+    }
+
+    @Override
+    public List<Header> headers() {
+        return List.of();
+//        request.headers().stream().map(h -> new Header(h.n))
     }
 
     @Override
@@ -37,7 +45,7 @@ class UsecaseStep extends TestStep {
         for (var savedVariable : savedVariables.properties()) {
             if (looksLikeMetaVariable(savedVariable.getValue())) {
                 String metaVariablePath = savedVariable.getValue().textValue();
-                var jsonPath = asJsonPath(trimBraces(metaVariablePath));
+                var jsonPath = asJsonPath(metaVariablePath);
                 var responseValue = actualResponse.at(jsonPath);
 
                 if (responseValue.isMissingNode()) {
@@ -57,7 +65,7 @@ class UsecaseStep extends TestStep {
     protected void resolveMetaVariables() {
         JsonNode expectedResponseValue = expectedResponse.expectedResponse();
         if (looksLikeMetaVariable(expectedResponseValue)) {
-            expectedResponse = new ExpectedResponse(context.getVariable(trimBraces(expectedResponseValue.textValue())));
+            expectedResponse = new ExpectedResponse(context.getVariable(expectedResponseValue.textValue()));
         } else {
             replaceMetaVariables(expectedResponseValue);
         }
@@ -70,17 +78,13 @@ class UsecaseStep extends TestStep {
             for (var prop : parentNode.properties()) {
                 var propValue = prop.getValue();
                 if (looksLikeMetaVariable(propValue)) {
-                    var resolvedValue = context.getVariable(trimBraces(propValue.textValue()));
+                    var resolvedValue = context.getVariable(propValue.textValue());
                     parentNode.replace(prop.getKey(), resolvedValue);
                 } else if (propValue.isObject()) {
                     replaceMetaVariables(propValue);
                 }
             }
         }
-    }
-
-    private String trimBraces(String metaVariable) {
-        return metaVariable.substring(2, metaVariable.length() - 2);
     }
 
     private String asJsonPath(String metaVariable) {

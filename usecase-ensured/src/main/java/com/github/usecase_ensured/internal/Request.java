@@ -1,37 +1,23 @@
 package com.github.usecase_ensured.internal;
 
-import io.restassured.http.Header;
-
-import java.util.List;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.restassured.http.Headers;
 
 public abstract class Request {
-    protected final Method method;
-    protected final List<Header> headers;
-    protected final String url;
-    protected final String body;
+    protected final JsonNode request;
 
-    protected Request(Method method, List<Header> headers, String url, String body) {
-        this.method = method;
-        this.headers = headers;
-        this.url = url;
-        this.body = body;
+    protected Request(JsonNode request) {
+        this.request = request;
     }
 
-    public Method method() {
-        return method;
+    public JsonNode request() {
+        return request;
     }
 
-    public List<Header> headers() {
-        return headers;
-    }
-
-    public String url() {
-        return url;
-    }
-
-    public String body() {
-        return body;
-    }
+    public abstract String url();
+    public abstract String body();
+    public abstract Headers headers();
+    public abstract String method();
 
     public enum Method {
         GET, POST, PUT, DELETE
