@@ -1,0 +1,89 @@
+{
+  "name": "can use saved meta variables in nested parts of JSON",
+  "steps": [
+    {
+      "name": "create detailed dummy -- save JSON value node",
+      "do": {
+        "method": "POST",
+        "url": "http://localhost:8080/dummy/detailed",
+        "body": {
+          "name": "detailed",
+          "details": {
+            "age": 27,
+            "favoriteColor": "red"
+          }
+        },
+        "saved": {
+          "name": "{{name}}",
+          "id": "{{id}}",
+          "favColor": "{{details.favoriteColor}}"
+        }
+      },
+      "then": {
+        "statusCode": 201,
+        "body": {
+          "name": "{{saved.name}}",
+          "id": "{{saved.id}}",
+          "details": {
+            "age": 27,
+            "favoriteColor": "{{saved.favColor}}"
+          }
+        }
+      }
+    },
+    {
+      "name": "create detailed dummy -- save JSON object node",
+      "do": {
+        "method": "POST",
+        "url": "http://localhost:8080/dummy/detailed",
+        "body": {
+          "name": "detailed",
+          "details": {
+            "age": 27,
+            "favoriteColor": "red"
+          }
+        },
+        "saved": {
+          "name": "{{name}}",
+          "id": "{{id}}",
+          "details": "{{details}}"
+        }
+      },
+      "then": {
+        "statusCode": 201,
+        "body": {
+          "name": "{{saved.name}}",
+          "id": "{{saved.id}}",
+          "details": "{{saved.details}}"
+        }
+      }
+    },
+    {
+      "name": "create detailed dummy -- save primitive value",
+      "do": {
+        "method": "POST",
+        "url": "http://localhost:8080/dummy/detailed",
+        "body": {
+          "name": "detailed",
+          "details": {
+            "age": 27,
+            "favoriteColor": "red"
+          }
+        },
+        "saved": {
+          "name": "detailed",
+          "id": "{{id}}",
+          "details": "{{details}}"
+        }
+      },
+      "then": {
+        "statusCode": 201,
+        "body": {
+          "name": "{{saved.name}}",
+          "id": "{{saved.id}}",
+          "details": "{{saved.details}}"
+        }
+      }
+    }
+  ]
+}

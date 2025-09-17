@@ -1,0 +1,36 @@
+{
+  "name": "create and fetch with custom syntax",
+  "steps": [
+    {
+      "name": "create",
+      "do": {
+        "method": "POST",
+        "url": "http://localhost:8080/dummy",
+        "body": {
+          "name": "Bob"
+        }
+      },
+      "then": {
+        "statusCode": 201,
+        "body": {
+          "name": "Bob",
+          "id": "{{any}}"
+        }
+      }
+    },
+    {
+      "name": "fetch",
+      "do": {
+        "method": "GET",
+        "url": "http://localhost:8080/dummy/0"
+      },
+      "then": {
+        "statusCode": 200,
+        "body": {
+          "name": "Bob",
+          "id": 0
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "accessing secure endpoint",
+  "steps": [
+    {
+      "name": "call secure endpoint",
+      "do": {
+        "method": "GET",
+        "url": "http://localhost:8080/dummy/secret",
+        "headers": {
+          "Authorization": "Basic Ym9iOmJvYg=="
+        }
+      },
+      "then": {
+        "statusCode": 200,
+        "body": "this is a secret"
+      }
+    }
+  ]
+}

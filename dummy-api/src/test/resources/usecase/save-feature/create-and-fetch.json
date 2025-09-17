@@ -1,0 +1,39 @@
+{
+  "name": "create and fetch with custom syntax",
+  "steps": [
+    {
+      "name": "create",
+      "do": {
+        "method": "POST",
+        "url": "http://localhost:8080/dummy",
+        "body": {
+          "name": "Bob"
+        },
+        "saved": {
+          "generatedId": "{{id}}"
+        }
+      },
+      "then": {
+        "statusCode": 201,
+        "body": {
+          "name": "Bob",
+          "id": "{{saved.generatedId}}"
+        }
+      }
+    },
+    {
+      "name": "fetch",
+      "do": {
+        "method": "GET",
+        "url": "http://localhost:8080/dummy/{{saved.generatedId}}"
+      },
+      "then": {
+        "statusCode": 200,
+        "body": {
+          "name": "Bob",
+          "id": "{{saved.generatedId}}"
+        }
+      }
+    }
+  ]
+}

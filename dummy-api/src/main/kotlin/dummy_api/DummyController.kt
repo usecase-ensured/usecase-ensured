@@ -34,7 +34,7 @@ class DummyController {
 
     @GetMapping("secret")
     fun getSecret() : String {
-        return "this is a secret"
+        return "\"this is a secret\""
     }
 
     @GetMapping("all")
@@ -46,4 +46,7 @@ class DummyController {
         store.clear()
         idCounter = 0
     }
+
+    data class DummyDto(val id: Int, val name: String)
+    data class DummyCreationRequest(val name: String)
 }
