@@ -8,11 +8,12 @@ import io.restassured.http.Headers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 class UsecaseRequest extends Request {
     private final JsonNode savedVariables;
     private final UsecaseContext context;
-    private final String metaVariableRegex = ".*\\{\\{.+}}.*";
+    private static final Pattern metaVariableRegex = Pattern.compile("\\{\\{(?:(?!\\{\\{).)*}}");
 
     protected UsecaseRequest(JsonNode request, UsecaseContext context) {
         super(request);
@@ -30,11 +31,11 @@ class UsecaseRequest extends Request {
         if (containsMetaVariable(urlNode)) {
             var resolvedString = new StringBuilder();
             String url = urlNode.asText();
-            var metaVariablesAsSeparators = url.splitWithDelimiters(metaVariableRegex, -1);
+            var metaVariablesAsSeparators = url.splitWithDelimiters(metaVariableRegex.pattern(), -1);
 
             for (var part : metaVariablesAsSeparators) {
                 if (isMetaVariable(part)) {
-                    resolvedString.append(context.getVariable(part));
+                    resolvedString.append(context.getVariable(part).asText());
                 } else {
                     resolvedString.append(part);
                 }
@@ -81,7 +82,7 @@ class UsecaseRequest extends Request {
     }
 
     private boolean containsMetaVariable(JsonNode json) {
-        return json.isTextual() && json.textValue().matches(metaVariableRegex);
+        return json.isTextual() && metaVariableRegex.matcher(json.textValue()).find();
     }
 
     private boolean isMetaVariable(String str) {
