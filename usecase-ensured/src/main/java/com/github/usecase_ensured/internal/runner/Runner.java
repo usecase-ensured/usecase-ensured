@@ -1,8 +1,6 @@
 package com.github.usecase_ensured.internal.runner;
 
 import io.restassured.http.ContentType;
-import io.restassured.http.Headers;
-import io.restassured.http.Method;
 
 import static io.restassured.RestAssured.given;
 
@@ -16,9 +14,9 @@ public class Runner {
                 requestBuilder.contentType(ContentType.JSON);
             }
             requestBuilder.accept(ContentType.JSON);
-            requestBuilder.headers(new Headers(step.request().headers()));
+            requestBuilder.headers(step.request().headers());
 
-            var response = requestBuilder.request(step.request().method().name());
+            var response = requestBuilder.request(step.request().method());
 
             step.assertOn(response);
         }

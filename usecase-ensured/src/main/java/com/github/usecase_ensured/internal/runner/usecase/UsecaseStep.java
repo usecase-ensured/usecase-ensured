@@ -45,7 +45,7 @@ class UsecaseStep extends TestStep {
         for (var savedVariable : savedVariables.properties()) {
             if (looksLikeMetaVariable(savedVariable.getValue())) {
                 String metaVariablePath = savedVariable.getValue().textValue();
-                var jsonPath = asJsonPath(metaVariablePath);
+                var jsonPath = asJsonPath(withoutBraces(metaVariablePath));
                 var responseValue = actualResponse.at(jsonPath);
 
                 if (responseValue.isMissingNode()) {
@@ -89,6 +89,10 @@ class UsecaseStep extends TestStep {
 
     private String asJsonPath(String metaVariable) {
         return "/" + metaVariable.replace(".", "/");
+    }
+
+    private String withoutBraces(String metaVariable) {
+        return metaVariable.substring(2, metaVariable.length() - 2);
     }
 
     private Boolean looksLikeMetaVariable(JsonNode json) {

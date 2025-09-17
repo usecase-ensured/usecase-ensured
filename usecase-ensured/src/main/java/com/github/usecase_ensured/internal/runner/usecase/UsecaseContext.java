@@ -2,6 +2,7 @@ package com.github.usecase_ensured.internal.runner.usecase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.usecase_ensured.internal.ExpectedResponse;
 import com.github.usecase_ensured.internal.TestStep;
@@ -61,6 +62,33 @@ public class UsecaseContext extends Context {
         savedMetaVariables.put(key, responseValue);
     }
 
+    protected JsonNode resolve(JsonNode expectedResponse) {
+        JsonNode expectedResponseValue = expectedResponse;
+        if (looksLikeMetaVariable(expectedResponseValue)) {
+            return getVariable(expectedResponseValue.textValue());
+        } else {
+            JsonNode expectedResponseValue1 = replaceMetaVariables(expectedResponseValue);
+            return expectedResponseValue1;
+        }
+
+    }
+
+    private JsonNode replaceMetaVariables(JsonNode expectedResponse) {
+        if (expectedResponse.isObject()) {
+            var parentNode = (ObjectNode) expectedResponse;
+            for (var prop : parentNode.properties()) {
+                var propValue = prop.getValue();
+                if (looksLikeMetaVariable(propValue)) {
+                    var resolvedValue = getVariable(propValue.textValue());
+                    parentNode.replace(prop.getKey(), resolvedValue);
+                } else if (propValue.isObject()) {
+                    parentNode.replace(prop.getKey(), replaceMetaVariables(propValue));
+                }
+            }
+        }
+        return expectedResponse;
+    }
+
     public JsonNode getVariable(String metaVariable) {
         if (metaVariable.equals("{{any}}")) {
             return TextNode.valueOf("{{any}}");
@@ -89,6 +117,12 @@ public class UsecaseContext extends Context {
 
     private String trimBraces(String metaVariable) {
         return metaVariable.substring(2, metaVariable.length() - 2);
+    }
+
+    private Boolean looksLikeMetaVariable(JsonNode json) {
+        return json.isTextual()
+                && json.textValue().startsWith("{{")
+                && json.textValue().endsWith("}}");
     }
 
 }

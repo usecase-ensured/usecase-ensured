@@ -3,7 +3,11 @@ package com.github.usecase_ensured.internal.runner.usecase;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.usecase_ensured.internal.Request;
+import io.restassured.http.Header;
 import io.restassured.http.Headers;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class UsecaseRequest extends Request {
     private final JsonNode savedVariables;
@@ -22,9 +26,9 @@ class UsecaseRequest extends Request {
 
     @Override
     public String url() {
-        var urlNode = (TextNode) request.required("url");
-        var resolvedString = new StringBuilder();
+        var urlNode = (TextNode) request.requiredAt("/url");
         if (containsMetaVariable(urlNode)) {
+            var resolvedString = new StringBuilder();
             String url = urlNode.asText();
             var metaVariablesAsSeparators = url.splitWithDelimiters(metaVariableRegex, -1);
 
@@ -35,29 +39,56 @@ class UsecaseRequest extends Request {
                     resolvedString.append(part);
                 }
             }
+            return resolvedString.toString();
+        } else {
+            return urlNode.asText();
         }
-        return resolvedString.toString();
     }
 
     @Override
     public String body() {
-        return "";
+        var body = request.at("/body");
+        if (body.isMissingNode()) {
+            return null;
+        }
+
+        String text = context.resolve(body).toString();
+        return text;
     }
 
     @Override
     public Headers headers() {
-        return null;
+        var headers = request.at("/headers");
+
+        if (headers.isMissingNode()) {
+            return new Headers(List.of());
+        }
+
+        headers = context.resolve(headers);
+        var acc = new ArrayList<Header>();
+
+        for (var header : headers.properties()) {
+            acc.add(new Header(header.getKey(), header.getValue().asText()));
+        }
+
+        Headers headers1 = new Headers(acc);
+        return headers1;
     }
 
     @Override
     public String method() {
-        return "";
+        return request.requiredAt("/method").asText();
     }
 
     private boolean containsMetaVariable(JsonNode json) {
         return json.isTextual() && json.textValue().matches(metaVariableRegex);
     }
+
     private boolean isMetaVariable(String str) {
         return str.startsWith("{{") && str.endsWith("}}");
+    }
+
+    private boolean isMetaVariable(JsonNode json) {
+        return json.isTextual() && isMetaVariable(json.asText());
     }
 }
