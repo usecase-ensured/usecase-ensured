@@ -1,13 +1,9 @@
 package com.github.usecase_ensured.internal.runner.usecase;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.usecase_ensured.internal.ExpectedResponse;
 import com.github.usecase_ensured.internal.TestStep;
-import io.restassured.http.Header;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 class UsecaseStep extends TestStep {
@@ -17,25 +13,19 @@ class UsecaseStep extends TestStep {
                 Path filePath,
                 String name,
                 UsecaseRequest request,
-                ExpectedResponse expectedResponse) {
+                JsonNode expectedResponse) {
         super(filePath, name, request, expectedResponse);
         this.context = context;
     }
 
     @Override
-    public List<Header> headers() {
-        return List.of();
-//        request.headers().stream().map(h -> new Header(h.n))
-    }
-
-    @Override
     protected Optional<JsonNode> expectedStatusCodeJsonNode() {
-        return expectedResponse.expectedResponse().optional("statusCode");
+        return expectedResponse.optional("statusCode");
     }
 
     @Override
     protected Optional<JsonNode> expectedBodyJsonNode() {
-        return expectedResponse.expectedResponse().optional("body");
+        return expectedResponse.optional("body");
     }
 
     @Override
@@ -43,7 +33,7 @@ class UsecaseStep extends TestStep {
         var savedVariables = ((UsecaseRequest) request).savedVariables();
 
         for (var savedVariable : savedVariables.properties()) {
-            if (looksLikeMetaVariable(savedVariable.getValue())) {
+            if (UsecaseContext.Helper.looksLikeMetaVariable(savedVariable.getValue())) {
                 String metaVariablePath = savedVariable.getValue().textValue();
                 var jsonPath = asJsonPath(withoutBraces(metaVariablePath));
                 var responseValue = actualResponse.at(jsonPath);
@@ -63,28 +53,7 @@ class UsecaseStep extends TestStep {
 
     @Override
     protected void resolveMetaVariables() {
-        JsonNode expectedResponseValue = expectedResponse.expectedResponse();
-        if (looksLikeMetaVariable(expectedResponseValue)) {
-            expectedResponse = new ExpectedResponse(context.getVariable(expectedResponseValue.textValue()));
-        } else {
-            replaceMetaVariables(expectedResponseValue);
-        }
-
-    }
-
-    private void replaceMetaVariables(JsonNode expectedResponse) {
-        if (expectedResponse.isObject()) {
-            var parentNode = (ObjectNode) expectedResponse;
-            for (var prop : parentNode.properties()) {
-                var propValue = prop.getValue();
-                if (looksLikeMetaVariable(propValue)) {
-                    var resolvedValue = context.getVariable(propValue.textValue());
-                    parentNode.replace(prop.getKey(), resolvedValue);
-                } else if (propValue.isObject()) {
-                    replaceMetaVariables(propValue);
-                }
-            }
-        }
+        expectedResponse = context.resolve(expectedResponse);
     }
 
     private String asJsonPath(String metaVariable) {
@@ -93,11 +62,5 @@ class UsecaseStep extends TestStep {
 
     private String withoutBraces(String metaVariable) {
         return metaVariable.substring(2, metaVariable.length() - 2);
-    }
-
-    private Boolean looksLikeMetaVariable(JsonNode json) {
-        return json.isTextual()
-                && json.textValue().startsWith("{{")
-                && json.textValue().endsWith("}}");
     }
 }

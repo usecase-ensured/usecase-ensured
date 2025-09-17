@@ -25,7 +25,7 @@
       "name": "fetch",
       "do": {
         "method": "GET",
-        "url": "http://localhost:8080/dummy/0"
+        "url": "http://localhost:8080/dummy/{{saved.generatedId}}"
       },
       "then": {
         "statusCode": 200,

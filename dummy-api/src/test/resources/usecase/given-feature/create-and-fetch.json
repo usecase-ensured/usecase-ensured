@@ -1,7 +1,8 @@
 {
   "name": "create and fetch with custom syntax",
   "given": {
-    "baseUrl": "http://localhost:8080/dummy"
+    "baseUrl": "http://localhost:8080/dummy",
+    "name": "Bob"
   },
   "steps": [
     {
@@ -10,7 +11,7 @@
         "method": "POST",
         "url": "{{given.baseUrl}}",
         "body": {
-          "name": "Bob"
+          "name": "{{given.name}}"
         },
         "saved": {
           "id": "{{id}}"

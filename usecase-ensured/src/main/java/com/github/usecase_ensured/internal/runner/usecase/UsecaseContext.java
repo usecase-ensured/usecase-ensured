@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.github.usecase_ensured.internal.ExpectedResponse;
 import com.github.usecase_ensured.internal.TestStep;
 import com.github.usecase_ensured.internal.runner.Context;
 
@@ -13,11 +12,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class UsecaseContext extends Context {
     public List<TestStep> steps;
     private final Map<String, JsonNode> savedMetaVariables = new HashMap<>();
     private final Map<String, JsonNode> givenMetaVariables = new HashMap<>();
+    private static final Pattern metaVariableRegex = Pattern.compile("\\{\\{(?:(?!\\{\\{).)*}}");
 
     public UsecaseContext(Path sourceFile) {
         var usecaseJson = read(sourceFile);
@@ -44,7 +45,7 @@ public class UsecaseContext extends Context {
             var name = usecaseStep.required("name").asText();
 
             var given = new UsecaseRequest(usecaseStep.required("do"), this);
-            var expected = new ExpectedResponse(usecaseStep.optional("then").orElse(NullNode.instance));
+            var expected = usecaseStep.optional("then").orElse(NullNode.instance);
 
             var step = new UsecaseStep(this, sourceFile, name, given, expected);
             steps.add(step);
@@ -63,12 +64,13 @@ public class UsecaseContext extends Context {
     }
 
     protected JsonNode resolve(JsonNode expectedResponse) {
-        JsonNode expectedResponseValue = expectedResponse;
-        if (looksLikeMetaVariable(expectedResponseValue)) {
-            return getVariable(expectedResponseValue.textValue());
+        if (Helper.looksLikeMetaVariable(expectedResponse)) {
+            return getVariable(expectedResponse.textValue());
+        } else if (Helper.containsMetaVariable(expectedResponse)) {
+            var resolvedString = resolveMetaVariablePartsOf((TextNode) expectedResponse);
+            return TextNode.valueOf(resolvedString);
         } else {
-            JsonNode expectedResponseValue1 = replaceMetaVariables(expectedResponseValue);
-            return expectedResponseValue1;
+            return replaceMetaVariables(expectedResponse);
         }
 
     }
@@ -78,9 +80,12 @@ public class UsecaseContext extends Context {
             var parentNode = (ObjectNode) expectedResponse;
             for (var prop : parentNode.properties()) {
                 var propValue = prop.getValue();
-                if (looksLikeMetaVariable(propValue)) {
+                if (Helper.looksLikeMetaVariable(propValue)) {
                     var resolvedValue = getVariable(propValue.textValue());
                     parentNode.replace(prop.getKey(), resolvedValue);
+                } else if (Helper.containsMetaVariable(propValue)) {
+                    var resolvedString = resolveMetaVariablePartsOf((TextNode) propValue);
+                    parentNode.replace(prop.getKey(), TextNode.valueOf(resolvedString));
                 } else if (propValue.isObject()) {
                     parentNode.replace(prop.getKey(), replaceMetaVariables(propValue));
                 }
@@ -96,7 +101,7 @@ public class UsecaseContext extends Context {
 
         var parts = trimBraces(metaVariable).split("\\.", 2);
 
-        var invalidMetaVariablePath = new RuntimeException("invalid meta variable classifier parts[0]");
+        var invalidMetaVariablePath = new RuntimeException("invalid meta variable classifier %s".formatted(parts[0]));
 
         if (parts.length != 2) {
             throw invalidMetaVariablePath;
@@ -119,10 +124,35 @@ public class UsecaseContext extends Context {
         return metaVariable.substring(2, metaVariable.length() - 2);
     }
 
-    private Boolean looksLikeMetaVariable(JsonNode json) {
-        return json.isTextual()
-                && json.textValue().startsWith("{{")
-                && json.textValue().endsWith("}}");
+    public String resolveMetaVariablePartsOf(TextNode urlNode) {
+        var resolvedString = new StringBuilder();
+        String url = urlNode.asText();
+        var metaVariablesAsSeparators = url.splitWithDelimiters(metaVariableRegex.pattern(), -1);
+
+        for (var part : metaVariablesAsSeparators) {
+            if (Helper.isMetaVariable(part)) {
+                resolvedString.append(getVariable(part).asText());
+            } else {
+                resolvedString.append(part);
+            }
+        }
+        return resolvedString.toString();
     }
 
+    public static class Helper {
+
+        public static boolean containsMetaVariable(JsonNode json) {
+            return json.isTextual() && metaVariableRegex.matcher(json.textValue()).find();
+        }
+
+        public static Boolean looksLikeMetaVariable(JsonNode json) {
+            return json.isTextual()
+                    && json.textValue().startsWith("{{")
+                    && json.textValue().endsWith("}}");
+        }
+
+        public static boolean isMetaVariable(String str) {
+            return str.startsWith("{{") && str.endsWith("}}");
+        }
+    }
 }

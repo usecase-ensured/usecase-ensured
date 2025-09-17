@@ -8,12 +8,10 @@ import io.restassured.http.Headers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 class UsecaseRequest extends Request {
     private final JsonNode savedVariables;
     private final UsecaseContext context;
-    private static final Pattern metaVariableRegex = Pattern.compile("\\{\\{(?:(?!\\{\\{).)*}}");
 
     protected UsecaseRequest(JsonNode request, UsecaseContext context) {
         super(request);
@@ -28,19 +26,8 @@ class UsecaseRequest extends Request {
     @Override
     public String url() {
         var urlNode = (TextNode) request.requiredAt("/url");
-        if (containsMetaVariable(urlNode)) {
-            var resolvedString = new StringBuilder();
-            String url = urlNode.asText();
-            var metaVariablesAsSeparators = url.splitWithDelimiters(metaVariableRegex.pattern(), -1);
-
-            for (var part : metaVariablesAsSeparators) {
-                if (isMetaVariable(part)) {
-                    resolvedString.append(context.getVariable(part).asText());
-                } else {
-                    resolvedString.append(part);
-                }
-            }
-            return resolvedString.toString();
+        if (UsecaseContext.Helper.containsMetaVariable(urlNode)) {
+            return context.resolveMetaVariablePartsOf(urlNode);
         } else {
             return urlNode.asText();
         }
@@ -53,8 +40,7 @@ class UsecaseRequest extends Request {
             return null;
         }
 
-        String text = context.resolve(body).toString();
-        return text;
+        return context.resolve(body).toString();
     }
 
     @Override
@@ -72,24 +58,11 @@ class UsecaseRequest extends Request {
             acc.add(new Header(header.getKey(), header.getValue().asText()));
         }
 
-        Headers headers1 = new Headers(acc);
-        return headers1;
+        return new Headers(acc);
     }
 
     @Override
     public String method() {
         return request.requiredAt("/method").asText();
-    }
-
-    private boolean containsMetaVariable(JsonNode json) {
-        return json.isTextual() && metaVariableRegex.matcher(json.textValue()).find();
-    }
-
-    private boolean isMetaVariable(String str) {
-        return str.startsWith("{{") && str.endsWith("}}");
-    }
-
-    private boolean isMetaVariable(JsonNode json) {
-        return json.isTextual() && isMetaVariable(json.asText());
     }
 }
