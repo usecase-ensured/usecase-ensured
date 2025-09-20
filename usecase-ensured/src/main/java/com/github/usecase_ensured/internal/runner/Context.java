@@ -18,12 +18,9 @@ public abstract class Context {
     public abstract List<TestStep> steps();
 
     public static Context configureWith(Usecase usecase) {
-        return switch (usecase.type()) {
-            case POSTMAN -> throw new RuntimeException("NOOP");
-            case USECASE -> new UsecaseContext(usecase.type().pathPrefix.resolve(usecase.value()));
-        };
-        
+        return new UsecaseContext(usecase.type().pathPrefix.resolve(usecase.value()));
     }
+
     protected JsonNode read(Path path) {
         ensureThatPathPointsToFile(path);
         try {
@@ -33,6 +30,7 @@ public abstract class Context {
         }
 
     }
+
     private void ensureThatPathPointsToFile(Path path) {
         if (Files.notExists(path)) {
             throw new RuntimeException("%s is not a valid file".formatted(path));
