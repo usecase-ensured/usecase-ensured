@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.restassured.response.Response;
 
 import java.nio.file.Path;
-import java.util.*;
+import module java.base;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +22,7 @@ public abstract class TestStep {
         return request;
     }
 
-    public TestStep(Path filePath, String name, Request request, JsonNode  expectedResponse) {
+    public TestStep(Path filePath, String name, Request request, JsonNode expectedResponse) {
         this.filePath = filePath;
         this.name = name;
         this.request = request;
@@ -54,9 +54,9 @@ public abstract class TestStep {
                """.formatted(String.join(System.lineSeparator(), newS));
     }
 
-    protected abstract Optional<JsonNode> expectedStatusCodeJsonNode();
+    protected abstract Optional<JsonNode> expectedStatusCode();
 
-    protected abstract Optional<JsonNode> expectedBodyJsonNode();
+    protected abstract Optional<JsonNode> expectedBodyWithoutVariables(JsonNode actualBody);
 
     /**
      * Updates the {@link com.github.usecase_ensured.internal.runner.Context} with the meta variables introduced in this
@@ -74,20 +74,17 @@ public abstract class TestStep {
 
     public void assertOn(Response response) {
         if (expectedResponse != null) {
-            var expectedStatusCode = expectedStatusCodeJsonNode();
+            var expectedStatusCode = expectedStatusCode();
             if (expectedStatusCode.isPresent()) {
                 var msg = "invalid HTTP status: " + asTraceHint();
                 assertEquals(expectedStatusCode.get().asInt(), response.statusCode(), msg);
             }
 
-            var expected = expectedBodyJsonNode();
+            var actualBody = response.body().as(JsonNode.class);
+            var expected = expectedBodyWithoutVariables(actualBody);
+
             if (expected.isPresent()) {
-                var actual = response.body().as(JsonNode.class);
-
-                updateSavedMetaVariables(actual);
-                resolveMetaVariables();
-
-                for (var assertion : generateAssertions(expected.get(), actual)) {
+                for (var assertion : generateAssertions(expected.get(), actualBody)) {
                     assertion.execute();
                 }
             }
