@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.restassured.response.Response;
 
 import java.nio.file.Path;
-import module java.base;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
