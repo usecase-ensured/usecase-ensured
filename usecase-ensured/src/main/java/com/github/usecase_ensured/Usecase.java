@@ -10,37 +10,86 @@ import java.nio.file.Paths;
  * integration test!
  * Displaying the {@code run} button in the IDE near the test method signature requires the usual
  * {@link org.junit.jupiter.api.Test} annotation.
- * <h2>Supported formats</h2>
- * <h4>Postman</h4>
- * The Postman collections are expected in the {@code test/resources/postman} folder of your project.
- * Simply exporting collections from Postman is enough, they should be executed correctly.
- * <b>Postman environment variables are not supported</b> at the moment.
- * Postman's <b>post-response script</b> is used to <b>add assertions</b> to any step of the collection.
- * The content is expected to have a certain structure, here is an example:
+ * <h2>File location & format</h2>
+ * <p>The files need to be put into the {@code test/resources/usecase} directory in your project.</p>
+ * <p>
+ * The format is a JSON file that follow a certain convention.
+ * The specification is made more dynamic with the help of magic strings, called meta variables.
+ * Bellow is an example:
+ * </p>
  * <pre>
  * {@code
- * const response = {
- * "response": 200,
- * "content": {
- * "id": 0,
- * "name": "dummy"
- * "age": "{{any}}"
- * }
+ * {
+ *   "name": "create and fetch with custom syntax",
+ *   "given": {
+ *     "baseUrl": "http://localhost:8080/dummy",
+ *     "name": "Bob"
+ *   },
+ *   "steps": [
+ *     {
+ *       "name": "create",
+ *       "do": {
+ *         "method": "POST",
+ *         "url": "{{given.baseUrl}}",
+ *         "body": {
+ *           "name": "{{given.name}}"
+ *         },
+ *         "saved": {
+ *           "id": "{{id}}"
+ *         }
+ *       },
+ *       "then": {
+ *         "statusCode": 201,
+ *         "body": {
+ *           "name": "Bob",
+ *           "id": "{{saved.id}}"
+ *         }
+ *       }
+ *     },
+ *     {
+ *       "name": "fetch",
+ *       "do": {
+ *         "method": "GET",
+ *         "url": "{{given.baseUrl}}/{{saved.id}}"
+ *       },
+ *       "then": {
+ *         "statusCode": 200,
+ *         "body": {
+ *           "name": "Bob",
+ *           "id": 0
+ *         }
+ *       }
+ *     }
+ *   ]
  * }
  * }
  * </pre>
- * <b>The meta variable {@code "{{any}}"}</b> can be used to express that a given field
- * is allowed to have any value.
+ * <p>
+ * Notice that at the top level we have the {@code given} field, it can be used to define variables accessible
+ * in any step of  the usecase run. Each step also has the ability to define a {@code saved} field, which enables the
+ * saving of parts of the response. </p>
+ *
+ * <p>
+ * {@code given} meta variables are final, {@code saved} meta variables are updated in
+ * the order of the usecase step execution and can be overwritten by upcoming steps.
+ * </p>
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface Usecase {
     // The name of the file
+
+    /**
+     * <p>The name of the usecase file</p>
+     * <p>
+     * For the file {@code test/resources/usecase/test.json} provide the value
+     * {@code test.json}
+     * </p>
+     */
     String value() default "";
 
-    // FileType.POSTMAN by default. Details in FileType
-    FileType type() default FileType.POSTMAN;
+    FileType type() default FileType.USECASE;
 
     /**
      * Defines the type of data used in a {@link Usecase}
@@ -50,7 +99,6 @@ public @interface Usecase {
      * </ul>
      */
     enum FileType {
-        POSTMAN(Paths.get("src/test/resources/postman/")),
         USECASE(Paths.get("src/test/resources/usecase"));
 
         public final Path pathPrefix;

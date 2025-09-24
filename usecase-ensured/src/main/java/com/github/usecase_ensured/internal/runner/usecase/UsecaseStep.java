@@ -19,13 +19,16 @@ class UsecaseStep extends TestStep {
     }
 
     @Override
-    protected Optional<JsonNode> expectedStatusCodeJsonNode() {
-        return expectedResponse.optional("statusCode");
+    protected Optional<JsonNode> expectedStatusCode() {
+        return expectedResponse.deepCopy().optional("statusCode");
     }
 
     @Override
-    protected Optional<JsonNode> expectedBodyJsonNode() {
-        return expectedResponse.optional("body");
+    protected Optional<JsonNode> expectedBodyWithoutVariables(JsonNode actualBody) {
+        updateSavedMetaVariables(actualBody);
+        resolveMetaVariables();
+
+        return expectedResponse.deepCopy().optional("body");
     }
 
     @Override
