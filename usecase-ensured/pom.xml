@@ -12,7 +12,7 @@
     <!--need to specify group id again because otherwise the maven release fails-->
     <groupId>io.github.usecase-ensured</groupId>
     <artifactId>usecase-ensured</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
 
     <name>Usecase Ensured</name>
     <description>
