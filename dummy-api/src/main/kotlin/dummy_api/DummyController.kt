@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController
 class DummyController {
 
     var idCounter = 0;
-
-    val store = mutableMapOf<Int, DummyDto>()
+    val store = mutableMapOf(0 to DummyDto(0, "zero"))
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@RequestBody dto: DummyCreationRequest) : DummyDto {
-        val createdDummy = DummyDto(idCounter++, dto.name)
+    fun create(@RequestBody dto: DummyCreationRequest): DummyDto {
+        idCounter++
+        val createdDummy = DummyDto(idCounter, dto.name)
 
         store.put(createdDummy.id, createdDummy)
 
@@ -28,17 +28,17 @@ class DummyController {
     }
 
     @GetMapping("{id}")
-    fun get(@PathVariable id: Int) : DummyDto {
+    fun get(@PathVariable id: Int): DummyDto {
         return store.get(id) ?: throw RuntimeException("dummy $id not found")
     }
 
     @GetMapping("secret")
-    fun getSecret() : String {
+    fun getSecret(): String {
         return "\"this is a secret\""
     }
 
     @GetMapping("all")
-    fun list() : List<DummyDto> {
+    fun list(): List<DummyDto> {
         return store.values.toList()
     }
 
