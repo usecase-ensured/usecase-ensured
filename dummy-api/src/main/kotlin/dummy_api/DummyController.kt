@@ -19,8 +19,7 @@ class DummyController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody dto: DummyCreationRequest): DummyDto {
-        idCounter++
-        val createdDummy = DummyDto(idCounter, dto.name)
+        val createdDummy = DummyDto(idCounter++, dto.name)
 
         store.put(createdDummy.id, createdDummy)
 
